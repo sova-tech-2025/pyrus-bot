@@ -47,6 +47,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
+            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u simai1 --password-stdin
             IMAGE_NAME=ghcr.io/${{ github.repository }}/budget-limit:latest
             docker pull $IMAGE_NAME
             docker stop fastapi-app || true
