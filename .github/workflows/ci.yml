@@ -50,6 +50,6 @@ jobs:
             echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u simai1 --password-stdin
             IMAGE_NAME=ghcr.io/${{ github.repository }}/budget-limit:latest
             docker pull $IMAGE_NAME
-            docker stop fastapi-app || true
-            docker rm fastapi-app || true
-            docker run -d --name fastapi-app -p 3000:3000 $IMAGE_NAME
+            docker stop budget-limit || true
+            docker rm budget-limit || true
+            docker run -d --name budget-limit -p 3000:3000 $IMAGE_NAME
