@@ -29,12 +29,16 @@ def _is_signature_correct(message: bytes, secret: bytes, signature: str) -> bool
 
 
 def _prepare_response(body: str):
+    print(body)
     task = json.loads(body)["task"]
     comment = task["comments"][-1]
-    comment_author = comment["author"]
-    author_name = comment_author["first_name"] + " " + comment_author["last_name"]
-    comment_text = "Hello, {}! You said: {}".format(author_name, comment["text"])
-    return "{{ \"text\":\"{}\", \"reassign_to\":{{ \"id\":{} }} }}".format(comment_text, comment_author["id"])
+    comment_author = comment.get("author", {})
+    author_name = f'{comment_author.get("first_name", "")} {comment_author.get("last_name", "")}'.strip()
+    comment_text = comment.get("text", "[no text]")
+    return {
+        "text": f"Hello, {author_name}! You said: {comment_text}",
+        "reassign_to": {"id": comment_author.get("id")}
+    }
 
 @app.get("/health")
 async def health():
