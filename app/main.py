@@ -31,10 +31,12 @@ def _is_signature_correct(message: bytes, secret: bytes, signature: str) -> bool
 
 
 def _prepare_response(body: str):
-    print(body)
-    ctx = {}
-    task = json.loads(body)["task"]
-    ctx.access_token = task["access_token"]
+    data = json.loads(body)
+    print(data)
+
+    ctx = {"access_token": data.get("access_token")}
+
+    task = data.get("task", {})
 
     if json.loads(body).get("event") == "comment" and task.get("form_id") == 2336661 and task.get("current_step") == 1:
         handle_form_mutation(task, ctx)
