@@ -5,7 +5,7 @@ BASE_URL = "https://api.pyrus.com/v4"
 def get_form_budget_BDR(ctx):
     url = f"{BASE_URL}/forms/2346023/register"
     headers = {
-        'Authorization': f'Bearer {ctx.access_token}',
+        'Authorization': f'Bearer {ctx["access_token"]}',
         'Content-Type': 'application/json'
     }
 
@@ -32,7 +32,7 @@ def get_form_budget_BDR(ctx):
 def set_field_comment_BDR(ctx, task_id, body):
     url = f"{BASE_URL}/tasks/{task_id}/comments"
     headers = {
-        'Authorization': f'Bearer {ctx.access_token}',
+        'Authorization': f'Bearer {ctx["access_token"]}',
         'Content-Type': 'application/json'
     }
 
@@ -59,7 +59,7 @@ def set_field_comment_BDR(ctx, task_id, body):
 def set_field_comment_counts(ctx, task_id, body):
     url = f"{BASE_URL}/tasks/{task_id}/comments"
     headers = {
-        'Authorization': f'Bearer {ctx.access_token}',
+        'Authorization': f'Bearer {ctx["access_token"]}',
         'Content-Type': 'application/json'
     }
 
