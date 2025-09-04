@@ -31,7 +31,7 @@ def _is_signature_correct(message: bytes, secret: bytes, signature: str) -> bool
 
 
 def _prepare_response(body: str):
-    # print(body)
+    print(body)
     ctx = {}
     task = json.loads(body)["task"]
     ctx.access_token = task["access_token"]
