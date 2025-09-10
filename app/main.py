@@ -1,21 +1,48 @@
-import os
-
-from dotenv import load_dotenv
-from fastapi import FastAPI, Request, Header, HTTPException
-import hmac
 import hashlib
+import hmac
 import json
+import os
+from contextlib import asynccontextmanager
+from typing import Annotated
 
-from app.service.check import handle_form_mutation
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
+from dotenv import load_dotenv
+from fastapi import FastAPI, Header, HTTPException, Request
+
+from app.service.account import process_task
+from app.shared.cron.jobs import authenticate, budget_count
 
 load_dotenv()
-app = FastAPI()
+
+scheduler = AsyncIOScheduler()
 
 # env
 SECRET_KEY = os.getenv("BOT_SECRET_KEY")
 
+ctx = {"access_token": ""}
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # startup
+    scheduler.add_job(budget_count, CronTrigger(minute="*/30"))
+    scheduler.add_job(authenticate, CronTrigger(hour="*/12"))
+    scheduler.start()
+    print("Scheduler started")
+    authenticate()
+    budget_count()
+
+    yield
+
+    # shutdown
+    scheduler.shutdown()
+    print("Scheduler stopped")
+
+app = FastAPI(lifespan=lifespan)
+
 @app.post("/")
-async def index(request: Request, x_pyrus_sig: str = Header(...)):
+async def index(request: Request, x_pyrus_sig: Annotated[str, Header()] = ...):
     body = await request.body()
     secret = SECRET_KEY.encode()
 
@@ -32,32 +59,14 @@ def _is_signature_correct(message: bytes, secret: bytes, signature: str) -> bool
 
 def _prepare_response(body: str):
     data = json.loads(body)
-    print(data)
-
-    ctx = {"access_token": data.get("access_token")}
 
     task = data.get("task", {})
 
     if json.loads(body).get("event") == "comment" and task.get("form_id") == 2336661 and task.get("current_step") == 1:
-        handle_form_mutation(task, ctx)
-        # Подготовить ответ
-        comment = task["comments"][-1]
-        comment_author = comment.get("author", {})
-        return {
-            "text": f"Изменение формы",
-            "reassign_to": {"id": comment_author.get("id")}
-        }
+        process_task(task)
+        return
 
-
-    # Подготовить ответ
-    comment = task["comments"][-1]
-    comment_author = comment.get("author", {})
-    author_name = f'{comment_author.get("first_name", "")} {comment_author.get("last_name", "")}'.strip()
-    comment_text = comment.get("text", "[no text]")
-    return {
-        "text": f"Hello, {author_name}! You said: {comment_text}",
-        "reassign_to": {"id": comment_author.get("id")}
-    }
+    return
 
 @app.get("/health")
 async def health():
