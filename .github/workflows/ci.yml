@@ -56,4 +56,5 @@ jobs:
             --name budget-limit \
             -p 3000:3000 \
             -e BOT_SECRET_KEY=${{ secrets.BOT_SECRET_KEY }} \
+            -e BOT_LOGIN=${{ secrets.BOT_LOGIN }} \
             $IMAGE_NAME
