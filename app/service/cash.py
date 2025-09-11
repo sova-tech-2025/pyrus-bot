@@ -1,42 +1,36 @@
-import app.main
-from app.domains.account import AccountTask
+from app.config.forms import TestFormStatus
 from app.domains.bdr import BdrTask
+from app.domains.cash import CashTask
 from app.shared.pyrus.pyrus import (
-    get_form_accounts,
-    get_form_budget_BDR,
+    get_form_by_id,
     set_field_comment_BDR,
     set_field_comment_counts,
 )
 
 
-def process_cash():
-    ctx = app.main.ctx
-    accounts: list[AccountTask] = []
-    for task in get_form_accounts(ctx):
-        accounts.append(AccountTask(task))
+def process_cash(ctx, bdrs: list[BdrTask]):
+    cashes: list[CashTask] = []
+    for task in get_form_by_id(ctx, TestFormStatus.CASH.value):
+        cashes.append(CashTask(task))
 
-    bdrs: list[BdrTask] = []
-    for task in get_form_budget_BDR(ctx):
-        bdrs.append(BdrTask(task))
-
-    for account in accounts:
+    for cash in cashes:
         for bdr in bdrs:
-            if (set(account.extending_article) & set(bdr.extending_article)) and \
-                    ''.join(account.units) == ''.join(bdr.units) and \
-                    bdr.date_from <= account.date <= bdr.date_to:
-                if bdr.limit >= account.total:
-                    bdr.limit -= account.total
-                    account.is_over_limit = False
+            if (set(cash.extending_article) & set(bdr.extending_article)) and \
+                    ''.join(cash.units) == ''.join(bdr.units) and \
+                    bdr.date_from <= cash.date <= bdr.date_to:
+                if bdr.limit >= cash.total:
+                    bdr.limit -= cash.total
+                    cash.is_over_limit = False
                 else:
-                    account.is_over_limit = True
+                    cash.is_over_limit = True
                 break
         try:
-            set_field_comment_counts(ctx, account.id, {
+            set_field_comment_counts(ctx, cash.id, {
                             "text": "",
                             "field_updates": [
                                 {
-                                    "id": 28,
-                                    "value": "checked" if account.is_over_limit else "unchecked"
+                                    "id": 15,
+                                    "value": "checked" if cash.is_over_limit else "unchecked"
                                 }
                             ]
             })

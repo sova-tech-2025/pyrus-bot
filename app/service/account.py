@@ -1,7 +1,9 @@
 import app.main
+
+from app.config.forms import TestFormStatus
 from app.domains.account import AccountTask
 from app.domains.bdr import BdrTask
-from app.shared.pyrus.pyrus import get_form_budget_BDR, set_field_comment_counts
+from app.shared.pyrus.pyrus import get_form_by_id, set_field_comment_counts
 
 
 def process_task(task):
@@ -9,7 +11,7 @@ def process_task(task):
     account: AccountTask = AccountTask(task)
 
     bdrs: list[BdrTask] = []
-    for task in get_form_budget_BDR(ctx):
+    for task in get_form_by_id(ctx, TestFormStatus.BDR.value):
         bdrs.append(BdrTask(task))
 
     for bdr in bdrs:

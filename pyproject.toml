@@ -3,22 +3,35 @@ line-length = 120
 target-version = "py312"
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "B", "W", "UP"]
+# Базовые ошибки и стилистика
+select = ["E", "F", "I", "B", "W", "UP", "C90"]  # C90 = McCabe complexity
 extend-select = ["FAST001", "FAST002", "FAST003"]
+
+# Игнорим длинные строки (аналог printWidth) и предупреждение о зависимостях в функциях
 ignore = ["E501", "B008"]
+
+# Сложность
 mccabe = { max-complexity = 10 }
 
+# Настройка порядка импортов (аналог import/order)
 [tool.ruff.lint.isort]
 combine-as-imports = true
 force-single-line = false
 known-first-party = ["app", "src"]
 known-third-party = ["fastapi", "sqlalchemy", "requests"]
+lines-between-types = 1
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
 
 [tool.ruff.format]
-quote-style = "single"
-skip-magic-trailing-comma = true
-indent-style = "tab"
-line-ending = "auto"
+quote-style = "single"             # singleQuote: true
+indent-style = "tab"               # tabWidth = 4, но ты указал indent-style = tab → оставил табы
+skip-magic-trailing-comma = true   # trailingComma = es5
+line-ending = "auto"               # endOfLine: auto
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
 
 [tool.ruff.per-file-ignores]
-"tests/**" = ["E501", "T201"]
+"tests/**" = ["E501", "T201"]  # в тестах можно длинные строки и print()
+
+[tool.ruff.lint.flake8-unused-arguments]
+ignore-variadic-names = true   # аналог no-unused-vars (чуть мягче)

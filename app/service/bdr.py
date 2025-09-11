@@ -1,23 +1,17 @@
-import app.main
+from app.config.forms import TestFormStatus
 from app.domains.account import AccountTask
 from app.domains.bdr import BdrTask
 from app.shared.pyrus.pyrus import (
-    get_form_accounts,
-    get_form_budget_BDR,
+    get_form_by_id,
     set_field_comment_BDR,
     set_field_comment_counts,
 )
 
 
-def process_limits():
-    ctx = app.main.ctx
+def process_limits(ctx, bdrs: list[BdrTask]):
     accounts: list[AccountTask] = []
-    for task in get_form_accounts(ctx):
+    for task in get_form_by_id(ctx, TestFormStatus.ACCOUNTS.value):
         accounts.append(AccountTask(task))
-
-    bdrs: list[BdrTask] = []
-    for task in get_form_budget_BDR(ctx):
-        bdrs.append(BdrTask(task))
 
     for account in accounts:
         for bdr in bdrs:
