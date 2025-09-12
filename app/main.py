@@ -72,7 +72,7 @@ def _prepare_response(body: str):
                 TestFormStatus.ACCOUNTS.value
             ]
             and task.get("current_step") == 1):
-        handle_form_update(next((k.name for k in TestFormStatus if k.value == task.get("form_id")), None))
+        handle_form_update(next((k.name for k in TestFormStatus if k.value == task.get("form_id")), None), task)
         return
 
     return
