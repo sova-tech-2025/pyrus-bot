@@ -1,0 +1,33 @@
+from app.config.forms import TestFormStatus
+import app.main
+from app.domains.account import AccountTask
+from app.domains.bdr import BdrTask
+from app.domains.cash import CashTask
+from app.domains.payment import PaymentTask
+from app.service.bdr import associate_account, associate_cash, associate_payment, process_limit
+from app.shared.pyrus.pyrus import get_form_by_id
+
+
+def handle_form_update(key: str | None, input_task):
+    if key is None:
+        return
+
+    ctx = app.main.ctx
+
+    bdrs: list[BdrTask] = []
+    for task in get_form_by_id(ctx, TestFormStatus.BDR.value):
+        bdrs.append(BdrTask(task))
+
+    bdr_task = None
+    if key == 'ACCOUNTS':
+        account = AccountTask(input_task)
+        bdr_task = associate_account(bdrs, account)
+    elif key == 'PAYMENTS':
+        payment = PaymentTask(input_task)
+        bdr_task = associate_payment(bdrs, payment)
+    elif key == 'CASH':
+        cash = CashTask(input_task)
+        bdr_task = associate_cash(bdrs, cash)
+
+    if bdr_task:
+        process_limit(ctx, [bdr_task,])

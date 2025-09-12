@@ -11,8 +11,10 @@ from apscheduler.triggers.cron import CronTrigger
 from dotenv import load_dotenv
 from fastapi import FastAPI, Header, HTTPException, Request
 
+from app.config.forms import TestFormStatus
 from app.service.account import process_task
 from app.shared.cron.jobs import authenticate, budget_count
+from app.shared.webhook.handler import handle_form_update
 
 load_dotenv()
 
@@ -27,7 +29,7 @@ ctx = {"access_token": ""}
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # startup
-    scheduler.add_job(budget_count, CronTrigger(minute="*/30"))
+    scheduler.add_job(budget_count, CronTrigger(minute="*/60"))
     scheduler.add_job(authenticate, CronTrigger(hour="*/12"))
     scheduler.start()
     print("Scheduler started")
@@ -63,8 +65,14 @@ def _prepare_response(body: str):
 
     task = data.get("task", {})
 
-    if json.loads(body).get("event") == "comment" and task.get("form_id") == 2336661 and task.get("current_step") == 1:
-        # process_task(task)
+    if (json.loads(body).get("event") == "comment"
+            and task.get("form_id") in [
+                TestFormStatus.PAYMENTS.value,
+                TestFormStatus.CASH.value,
+                TestFormStatus.ACCOUNTS.value
+            ]
+            and task.get("current_step") == 1):
+        handle_form_update(next((k.name for k in TestFormStatus if k.value == task.get("form_id")), None))
         return
 
     return

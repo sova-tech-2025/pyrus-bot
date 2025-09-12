@@ -28,6 +28,14 @@ def associate_accounts(ctx, bdrs: list[BdrTask]) -> list[BdrComposition]:
 
     return data
 
+def associate_account(bdrs: list[BdrTask], account: AccountTask) -> BdrComposition | None:
+    for bdr in bdrs:
+        if (set(account.extending_article) & set(bdr.extending_article)) and \
+                ''.join(account.units) == ''.join(bdr.units) and \
+                bdr.date_from <= account.date <= bdr.date_to:
+            return BdrComposition(bdr=bdr, account=account)
+    return None
+
 def associate_cashes(ctx, bdrs: list[BdrTask]) -> list[BdrComposition]:
     data: list[BdrComposition] = [] # Список ассоциаций наличных к бюджету БДР
     cashes: list[CashTask] = [] # Список задач счетов
@@ -47,6 +55,14 @@ def associate_cashes(ctx, bdrs: list[BdrTask]) -> list[BdrComposition]:
 
     return data
 
+def associate_cash(bdrs: list[BdrTask], cash: CashTask) -> BdrComposition | None:
+    for bdr in bdrs:
+        if (set(cash.extending_article) & set(bdr.extending_article)) and \
+                ''.join(cash.units) == ''.join(bdr.units) and \
+                bdr.date_from <= cash.date <= bdr.date_to:
+            return BdrComposition(bdr=bdr, task=cash)
+    return None
+
 def associate_payments(ctx, bdrs: list[BdrTask]) -> list[BdrComposition]:
     data: list[BdrComposition] = [] # Список ассоциаций платежей к бюджету БДР
     payments: list[PaymentTask] = [] # Список задач счетов
@@ -65,6 +81,15 @@ def associate_payments(ctx, bdrs: list[BdrTask]) -> list[BdrComposition]:
                     data.append(BdrComposition(bdr=bdr, task=payment))
                     break
     return data
+
+def associate_payment(bdrs: list[BdrTask], payment: PaymentTask) -> BdrComposition | None:
+    for bdr in bdrs:
+        for unit_sum in payment.unit_sums:
+            if (set(payment.extending_article) & set(bdr.extending_article)) and \
+                    ''.join(unit_sum.unit) == ''.join(bdr.units) and \
+                    bdr.date_from <= payment.date <= bdr.date_to:
+                return BdrComposition(bdr=bdr, task=payment)
+    return None
 
 def process_limit(ctx, bdr_compositions: list[BdrComposition]):
     for bdr_composition in bdr_compositions: # Счета
@@ -118,7 +143,6 @@ def process_limit(ctx, bdr_compositions: list[BdrComposition]):
             payment = bdr_composition.task
             bdr = bdr_composition.bdr
             payment.unit_sums.sort(key=lambda item: item.total, reverse=True)
-            print(payment.unit_sums)
             flag = False
             for unit_sum in payment.unit_sums:
                 if (set(payment.extending_article) & set(bdr.extending_article)) and \
