@@ -5,25 +5,27 @@ class BdrTask:
     date_from: str
     date_to: str
     budget: int
-    limit: int
+    limit: int | None
 
     def __init__(self, task, limit=False):
         fields = task.get("fields")
         self.id = task.get("id")
+        self.limit = 0
 
         for field in fields:
             if field["name"] == "Статья расходов":
                 self.extending_article = field.get("value").get("values")
-            if field["name"] == "Подразделения 1С":
+            elif field["name"] == "Подразделения 1С":
                 self.units = field.get("value").get("values")
-            if field["name"] == "От":
+            elif field["name"] == "От":
                 self.date_from = field.get("value")
-            if field["name"] == "До":
+            elif field["name"] == "До":
                 self.date_to = field.get("value")
-            if field["name"] == "Бюджет":
+            elif field["name"] == "Бюджет":
                 self.budget = field.get("value")
-            if field["name"] == "Остаток":
+            elif field["name"] == "Остаток":
                 self.limit = field.get("value")
-            if limit:
-                self.budget = self.limit
-        self.limit = self.budget
+        if not limit:
+            self.limit = self.budget
+        elif self.limit == 0 or self.limit is None:
+            self.limit = self.budget
