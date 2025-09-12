@@ -43,6 +43,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+@app.get("/")
 @app.post("/")
 async def index(request: Request, x_pyrus_sig: Annotated[str, Header()] = ...):
     body = await request.body()
