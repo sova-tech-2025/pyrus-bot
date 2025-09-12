@@ -7,7 +7,7 @@ class BdrTask:
     budget: int
     limit: int
 
-    def __init__(self, task):
+    def __init__(self, task, limit=False):
         fields = task.get("fields")
         self.id = task.get("id")
 
@@ -22,4 +22,8 @@ class BdrTask:
                 self.date_to = field.get("value")
             if field["name"] == "Бюджет":
                 self.budget = field.get("value")
+            if field["name"] == "Остаток":
+                self.limit = field.get("value")
+            if limit:
+                self.budget = self.limit
         self.limit = self.budget

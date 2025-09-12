@@ -16,7 +16,7 @@ def handle_form_update(key: str | None, input_task):
 
     bdrs: list[BdrTask] = []
     for task in get_form_by_id(ctx, TestFormStatus.BDR.value):
-        bdrs.append(BdrTask(task))
+        bdrs.append(BdrTask(task, limit=True))
 
     bdr_task = None
     if key == 'ACCOUNTS':
