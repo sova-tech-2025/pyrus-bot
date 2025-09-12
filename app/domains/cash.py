@@ -1,5 +1,9 @@
+from datetime import datetime
+
+
 class CashTask:
     id: int
+    create_date: datetime
     extending_article: list[str] | None
     units: list[str]
     date: str
@@ -10,6 +14,7 @@ class CashTask:
         fields = task.get("fields")
 
         self.id = task.get("id")
+        self.create_date = datetime.fromisoformat(task.get("create_date").replace("Z", "+00:00"))
         self.is_over_limit = False
 
         # {

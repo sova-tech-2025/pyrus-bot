@@ -1,5 +1,8 @@
+from datetime import datetime
+
 class AccountTask:
     id: int
+    create_date: datetime
     extending_article: list[str] | None
     article_bdr: str | list[str] | None
     units: list[str]
@@ -11,7 +14,17 @@ class AccountTask:
         fields = task.get("fields")
 
         self.id = task.get("id")
+        self.create_date = datetime.fromisoformat(task.get("create_date").replace("Z", "+00:00"))
         self.is_over_limit = False
+
+        # {
+        #     "id": 28,
+        #     "type": "checkmark",
+        #     "name": "Превышение лимита",
+        #     "tooltip": "",
+        #     "parent_id": 19,
+        #     "value": "unchecked"
+        # }
 
         for field in fields:
             if field['name'] == "Дата счета":

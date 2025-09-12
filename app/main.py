@@ -64,7 +64,7 @@ def _prepare_response(body: str):
     task = data.get("task", {})
 
     if json.loads(body).get("event") == "comment" and task.get("form_id") == 2336661 and task.get("current_step") == 1:
-        process_task(task)
+        # process_task(task)
         return
 
     return

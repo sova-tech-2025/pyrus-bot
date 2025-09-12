@@ -1,17 +1,31 @@
+from datetime import datetime
+
+from pydantic import BaseModel
+
+
+class UnitSum(BaseModel):
+    unit: list[str]
+    total: int
+
 class PaymentTask:
     id: int
+    create_date: datetime
     extending_article: list[str] | None
     article_bdr: str | list[str] | None
-    units: list[list[str]]
+    unit_sums: list[UnitSum]
     date: str
-    total: list[int]
     is_over_limit: bool
+
 
     def __init__(self, task):
         fields = task.get("fields")
 
         self.id = task.get("id")
+        self.create_date = datetime.fromisoformat(task.get("create_date").replace("Z", "+00:00"))
         self.is_over_limit = False
+        self.unit_sums = []
+        self.extending_article = None
+        self.article_bdr = None
 
         # {
         #     "id": 20,
@@ -22,15 +36,18 @@ class PaymentTask:
         # }
 
         for field in fields:
-            if field['name'] == "Дата расхода": # ?
+            if field['name'] == "Дата":
                 self.date = field.get("value")
-            elif field['name'] == "Статья расходов": # !
+                if self.date is None: self.date = self.create_date.strftime("%Y-%m-%d")
+            elif field['name'] == "Статья расходов":
                 self.extending_article = field.get("value").get("values")
-            elif field['name'] == "Статья БДР": # !
+            elif field['name'] == "Статья БДР":
                 self.article_bdr = field.get("visibility_condition").get("value")
             elif field['name'] == "Суммы по подразделениям":
                 for v in field.get("value"):
-                    self.units.append(v.get("cells")[0].get("value").get("values")) # !
-                    self.total.append(v.get("cells")[1].get("value")) # !
+                    self.unit_sums.append(UnitSum(
+                        unit=v.get("cells")[0].get("value").get("values"),
+                        total=v.get("cells")[1].get("value")
+                    ))
             if not self.extending_article:
                 self.extending_article = [self.article_bdr, ]
