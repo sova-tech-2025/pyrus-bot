@@ -33,7 +33,7 @@ def associate_account(bdrs: list[BdrTask], account: AccountTask) -> BdrCompositi
         if (set(account.extending_article) & set(bdr.extending_article)) and \
                 ''.join(account.units) == ''.join(bdr.units) and \
                 bdr.date_from <= account.date <= bdr.date_to:
-            return BdrComposition(bdr=bdr, account=account)
+            return BdrComposition(bdr=bdr, task=account)
     return None
 
 def associate_cashes(ctx, bdrs: list[BdrTask]) -> list[BdrComposition]:
