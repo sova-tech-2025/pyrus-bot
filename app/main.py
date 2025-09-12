@@ -29,7 +29,7 @@ ctx = {"access_token": ""}
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # startup
-    scheduler.add_job(budget_count, CronTrigger(minute="*/60"))
+    scheduler.add_job(budget_count, CronTrigger(minute=0))
     scheduler.add_job(authenticate, CronTrigger(hour="*/12"))
     scheduler.start()
     print("Scheduler started")
