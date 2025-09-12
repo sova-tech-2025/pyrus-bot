@@ -12,7 +12,6 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Header, HTTPException, Request
 
 from app.config.forms import TestFormStatus
-from app.service.account import process_task
 from app.shared.cron.jobs import authenticate, budget_count
 from app.shared.webhook.handler import handle_form_update
 
@@ -64,7 +63,7 @@ def _prepare_response(body: str):
     data = json.loads(body)
 
     task = data.get("task", {})
-
+    print(task)
     if (json.loads(body).get("event") == "comment"
             and task.get("form_id") in [
                 TestFormStatus.PAYMENTS.value,
