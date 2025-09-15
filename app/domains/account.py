@@ -4,7 +4,7 @@ class AccountTask:
     id: int
     create_date: datetime
     extending_article: list[str] | None
-    article_bdr: str | list[str] | None
+    article_bdr: list[str] | None
     units: list[str]
     date: str
     total: int
@@ -41,10 +41,10 @@ class AccountTask:
             elif field['name'] == "Подразделение":
                 self.units = field.get("value").get("values")
             elif field['name'] == "Статья расходов":
-                self.extending_article = field.get("value").get("values")
+                self.extending_article = field.get("value").get("values") if field.get("value") is not None else None
             elif field['name'] == "Статья БДР":
-                self.article_bdr = field.get("visibility_condition").get("values")
+                self.article_bdr = field.get("value").get("values") if field.get("value") is not None else None
             elif field['name'] == "Сумма":
                 self.total = field.get("value")
         if not self.extending_article:
-            self.extending_article = [self.article_bdr,]
+            self.extending_article = self.article_bdr

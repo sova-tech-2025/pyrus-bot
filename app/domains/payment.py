@@ -11,7 +11,7 @@ class PaymentTask:
     id: int
     create_date: datetime
     extending_article: list[str] | None
-    article_bdr: str | list[str] | None
+    article_bdr: list[str] | None
     unit_sums: list[UnitSum]
     date: str
     is_over_limit: bool
@@ -49,9 +49,9 @@ class PaymentTask:
                 self.date = field.get("value")
                 if self.date is None: self.date = self.create_date.strftime("%Y-%m-%d")
             elif field['name'] == "Статья расходов":
-                self.extending_article = field.get("value").get("values")
+                self.extending_article = field.get("value").get("values") if field.get("value") is not None else None
             elif field['name'] == "Статья БДР":
-                self.article_bdr = field.get("visibility_condition").get("value")
+                self.article_bdr = field.get("value").get("values") if field.get("value") is not None else None
             elif field['name'] == "Суммы по подразделениям":
                 for v in field.get("value"):
                     self.unit_sums.append(UnitSum(
@@ -59,4 +59,4 @@ class PaymentTask:
                         total=v.get("cells")[1].get("value")
                     ))
             if not self.extending_article:
-                self.extending_article = [self.article_bdr, ]
+                self.extending_article = self.article_bdr

@@ -38,8 +38,8 @@ class CashTask:
             if field['name'] == "Дата расхода":
                 self.date = field.get("value")
             elif field['name'] == "Подразделение":
-                self.units = field.get("value").get("values")
+                self.units = field.get("value").get("values") if field.get("value") is not None else None
             elif field['name'] == "Статья расходов":
-                self.extending_article = field.get("value").get("values")
+                self.extending_article = field.get("value").get("values") if field.get("value") is not None else None
             elif field['name'] == "Сумма":
                 self.total = field.get("value")

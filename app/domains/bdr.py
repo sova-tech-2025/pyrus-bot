@@ -14,9 +14,9 @@ class BdrTask:
 
         for field in fields:
             if field["name"] == "Статья расходов":
-                self.extending_article = field.get("value").get("values")
+                self.extending_article = field.get("value").get("values") if field.get("value") is not None else None
             elif field["name"] == "Подразделения 1С":
-                self.units = field.get("value").get("values")
+                self.units = field.get("value").get("values") if field.get("value") is not None else None
             elif field["name"] == "От":
                 self.date_from = field.get("value")
             elif field["name"] == "До":
