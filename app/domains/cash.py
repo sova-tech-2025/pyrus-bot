@@ -43,3 +43,5 @@ class CashTask:
                 self.extending_article = field.get("value").get("values") if field.get("value") is not None else None
             elif field['name'] == "Сумма":
                 self.total = field.get("value")
+        if not self.date:
+            self.date = '1900-01-01'

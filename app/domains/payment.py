@@ -64,3 +64,5 @@ class PaymentTask:
                 self.extending_article = self.article_bdr
             if not self.article_bdr and not self.extending_article:
                 self.extending_article = ['']
+            if not self.date:
+                self.date = '1900-01-01'
