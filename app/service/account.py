@@ -1,6 +1,6 @@
 import app.main
 
-from app.config.forms import TestFormStatus
+from app.config.forms import FormStatus
 from app.domains.account import AccountTask
 from app.domains.bdr import BdrTask
 from app.shared.pyrus.pyrus import get_form_by_id, set_field_comment_counts
@@ -11,7 +11,7 @@ def process_task(task):
     account: AccountTask = AccountTask(task)
 
     bdrs: list[BdrTask] = []
-    for task in get_form_by_id(ctx, TestFormStatus.BDR.value):
+    for task in get_form_by_id(ctx, FormStatus.BDR.value):
         bdrs.append(BdrTask(task))
 
     for bdr in bdrs:
@@ -27,7 +27,7 @@ def process_task(task):
                     "text": "",
                     "field_updates": [
                         {
-                            "id": 28,
+                            "id": AccountTask.OVERLIMIT_ID,
                             "value": "checked" if account.is_over_limit else "unchecked"
                         }
                     ]

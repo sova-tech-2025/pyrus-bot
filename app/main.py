@@ -11,7 +11,7 @@ from apscheduler.triggers.cron import CronTrigger
 from dotenv import load_dotenv
 from fastapi import FastAPI, Header, HTTPException, Request
 
-from app.config.forms import TestFormStatus
+from app.config.forms import FormStatus
 from app.shared.cron.jobs import authenticate, budget_count
 from app.shared.webhook.handler import handle_form_update
 
@@ -61,16 +61,14 @@ def _is_signature_correct(message: bytes, secret: bytes, signature: str) -> bool
 
 def _prepare_response(body: str):
     data = json.loads(body)
-    print(data)
     task = data.get("task", {})
     if (json.loads(body).get("event") == "comment"
             and task.get("form_id") in [
-                TestFormStatus.PAYMENTS.value,
-                TestFormStatus.CASH.value,
-                TestFormStatus.ACCOUNTS.value
-            ]
-            and task.get("current_step") == 1):
-        handle_form_update(next((k.name for k in TestFormStatus if k.value == task.get("form_id")), None), task)
+                FormStatus.PAYMENTS.value,
+                FormStatus.CASH.value,
+                FormStatus.ACCOUNTS.value
+            ]):
+        handle_form_update(next((k.name for k in FormStatus if k.value == task.get("form_id")), None), task)
         return
 
     return

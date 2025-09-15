@@ -10,6 +10,8 @@ class CashTask:
     total: int
     is_over_limit: bool
 
+    OVERLIMIT_ID = 16
+
     def __init__(self, task):
         fields = task.get("fields")
 
@@ -17,12 +19,19 @@ class CashTask:
         self.create_date = datetime.fromisoformat(task.get("create_date").replace("Z", "+00:00"))
         self.is_over_limit = False
 
-        # {
+        # { DEV
         #   "id": 15,
         #   "type": "checkmark",
         #   "name": "Превышение лимита",
         #   "tooltip": "",
         #   "value": "unchecked"
+        # }
+        # { PROD
+        #     "id": 16,
+        #     "type": "checkmark",
+        #     "name": "Превышение лимита",
+        #     "tooltip": "",
+        #     "value": "unchecked"
         # }
 
         for field in fields:

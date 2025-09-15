@@ -10,6 +10,8 @@ class AccountTask:
     total: int
     is_over_limit: bool
 
+    OVERLIMIT_ID = 57
+
     def __init__(self, task):
         fields = task.get("fields")
 
@@ -17,12 +19,19 @@ class AccountTask:
         self.create_date = datetime.fromisoformat(task.get("create_date").replace("Z", "+00:00"))
         self.is_over_limit = False
 
-        # {
+        # { DEV
         #     "id": 28,
         #     "type": "checkmark",
         #     "name": "Превышение лимита",
         #     "tooltip": "",
         #     "parent_id": 19,
+        #     "value": "unchecked"
+        # }
+        # { PROD
+        #     "id": 57,
+        #     "type": "checkmark",
+        #     "name": "Превышение лимита",
+        #     "tooltip": "",
         #     "value": "unchecked"
         # }
 

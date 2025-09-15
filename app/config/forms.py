@@ -7,8 +7,8 @@ class TestFormStatus(Enum):
     PAYMENTS = 2346726 # Платежи 2 и более ЮЛ
     CASH = 2346729 # Наличные КЕКС
 
-class _FormStatus(Enum):
-    ACCOUNTS = 2336661 # Счета
+class FormStatus(Enum):
+    ACCOUNTS = 1216424 # Счета
     BDR = 2346023 # Бюджет БДР
-    PAYMENTS = 2346726 # Платежи 2 и более ЮЛ
-    CASH = 2346729 # Наличные КЕКС
+    PAYMENTS = 1254419 # Платежи 2 и более ЮЛ
+    CASH = 1177102 # Наличные КЕКС

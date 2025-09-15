@@ -16,6 +16,7 @@ class PaymentTask:
     date: str
     is_over_limit: bool
 
+    OVERLIMIT_ID = 27
 
     def __init__(self, task):
         fields = task.get("fields")
@@ -27,8 +28,16 @@ class PaymentTask:
         self.extending_article = None
         self.article_bdr = None
 
-        # {
+
+        # { DEV
         #     "id": 20,
+        #     "type": "checkmark",
+        #     "name": "Превышение лимита",
+        #     "tooltip": "",
+        #     "value": "unchecked"
+        # }
+        # { PROD
+        #     "id": 27,
         #     "type": "checkmark",
         #     "name": "Превышение лимита",
         #     "tooltip": "",

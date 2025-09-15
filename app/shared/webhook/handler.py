@@ -1,4 +1,4 @@
-from app.config.forms import TestFormStatus
+from app.config.forms import FormStatus
 import app.main
 from app.domains.account import AccountTask
 from app.domains.bdr import BdrTask
@@ -15,7 +15,7 @@ def handle_form_update(key: str | None, input_task):
     ctx = app.main.ctx
 
     bdrs: list[BdrTask] = []
-    for task in get_form_by_id(ctx, TestFormStatus.BDR.value):
+    for task in get_form_by_id(ctx, FormStatus.BDR.value):
         bdrs.append(BdrTask(task, limit=True))
 
     bdr_task = None

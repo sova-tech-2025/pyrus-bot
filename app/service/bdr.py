@@ -1,4 +1,4 @@
-from app.config.forms import TestFormStatus
+from app.config.forms import FormStatus
 from app.domains.account import AccountTask
 from app.domains.bdr import BdrTask
 from app.domains.cash import CashTask
@@ -14,7 +14,7 @@ def associate_accounts(ctx, bdrs: list[BdrTask]) -> list[BdrComposition]:
     accounts: list[AccountTask] = [] # Список задач счетов
 
     # Получение задач счетов
-    for task in get_form_by_id(ctx, TestFormStatus.ACCOUNTS.value):
+    for task in get_form_by_id(ctx, FormStatus.ACCOUNTS.value):
         accounts.append(AccountTask(task))
 
     # Создание списка ассоциаций счетов к бюджету БДР
@@ -41,7 +41,7 @@ def associate_cashes(ctx, bdrs: list[BdrTask]) -> list[BdrComposition]:
     cashes: list[CashTask] = [] # Список задач счетов
 
     # Получение задач счетов
-    for task in get_form_by_id(ctx, TestFormStatus.CASH.value):
+    for task in get_form_by_id(ctx, FormStatus.CASH.value):
         cashes.append(CashTask(task))
 
     # Создание списка ассоциаций наличных к бюджету БДР
@@ -68,7 +68,7 @@ def associate_payments(ctx, bdrs: list[BdrTask]) -> list[BdrComposition]:
     payments: list[PaymentTask] = [] # Список задач счетов
 
     # Получение задач счетов
-    for task in get_form_by_id(ctx, TestFormStatus.PAYMENTS.value):
+    for task in get_form_by_id(ctx, FormStatus.PAYMENTS.value):
         payments.append(PaymentTask(task))
 
     # Создание списка ассоциаций наличных к бюджету БДР
@@ -108,7 +108,7 @@ def process_limit(ctx, bdr_compositions: list[BdrComposition]):
                                 "text": "",
                                 "field_updates": [
                                     {
-                                        "id": 28,
+                                        "id": AccountTask.OVERLIMIT_ID,
                                         "value": "checked" if bdr_composition.task.is_over_limit else "unchecked"
                                     }
                                 ]
@@ -131,7 +131,7 @@ def process_limit(ctx, bdr_compositions: list[BdrComposition]):
                     "text": "",
                     "field_updates": [
                         {
-                            "id": 15,
+                            "id": CashTask.OVERLIMIT_ID,
                             "value": "checked" if bdr_composition.task.is_over_limit else "unchecked"
                         }
                     ]
@@ -161,7 +161,7 @@ def process_limit(ctx, bdr_compositions: list[BdrComposition]):
                     "text": "",
                     "field_updates": [
                         {
-                            "id": 20,
+                            "id": PaymentTask.OVERLIMIT_ID,
                             "value": "checked" if payment.is_over_limit else "unchecked"
                         }
                     ]

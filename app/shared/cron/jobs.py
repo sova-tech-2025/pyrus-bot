@@ -1,6 +1,6 @@
 import app.main
 
-from app.config.forms import TestFormStatus
+from app.config.forms import FormStatus
 from app.domains.bdr import BdrTask
 from app.service.bdr import associate_accounts, associate_cashes, process_limit, associate_payments
 from app.shared.pyrus.pyrus import auth, get_form_by_id
@@ -11,7 +11,7 @@ def budget_count():
     ctx = app.main.ctx
 
     bdrs: list[BdrTask] = []
-    for task in get_form_by_id(ctx, TestFormStatus.BDR.value):
+    for task in get_form_by_id(ctx, FormStatus.BDR.value):
         bdrs.append(BdrTask(task))
 
     bdr_tasks: list[BdrComposition] = []

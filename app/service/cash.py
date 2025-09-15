@@ -1,4 +1,4 @@
-from app.config.forms import TestFormStatus
+from app.config.forms import FormStatus
 from app.domains.bdr import BdrTask
 from app.domains.cash import CashTask
 from app.shared.pyrus.pyrus import (
@@ -10,7 +10,7 @@ from app.shared.pyrus.pyrus import (
 
 def process_cash(ctx, bdrs: list[BdrTask]):
     cashes: list[CashTask] = []
-    for task in get_form_by_id(ctx, TestFormStatus.CASH.value):
+    for task in get_form_by_id(ctx, FormStatus.CASH.value):
         cashes.append(CashTask(task))
 
     for cash in cashes:
@@ -29,7 +29,7 @@ def process_cash(ctx, bdrs: list[BdrTask]):
                             "text": "",
                             "field_updates": [
                                 {
-                                    "id": 15,
+                                    "id": CashTask.OVERLIMIT_ID,
                                     "value": "checked" if cash.is_over_limit else "unchecked"
                                 }
                             ]
