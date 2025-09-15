@@ -13,7 +13,7 @@ class PaymentTask:
     extending_article: list[str] | None
     article_bdr: list[str] | None
     unit_sums: list[UnitSum]
-    date: str
+    date: str | None
     is_over_limit: bool
 
     OVERLIMIT_ID = 27
@@ -27,7 +27,7 @@ class PaymentTask:
         self.unit_sums = []
         self.extending_article = None
         self.article_bdr = None
-
+        self.date = None
 
         # { DEV
         #     "id": 20,
