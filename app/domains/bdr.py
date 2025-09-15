@@ -29,3 +29,5 @@ class BdrTask:
             self.limit = self.budget
         elif self.limit == 0 or self.limit is None:
             self.limit = self.budget
+        if not self.extending_article:
+            self.extending_article = ['']
