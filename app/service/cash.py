@@ -42,7 +42,7 @@ def process_cash(ctx, bdrs: list[BdrTask]):
             "text": "",
             "field_updates": [
                 {
-                    "id": 6,
+                    "id": 10,
                     "value": bdr.limit,
                 }
             ]
