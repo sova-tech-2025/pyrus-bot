@@ -31,3 +31,10 @@ class BdrTask:
             self.limit = self.budget
         if not self.extending_article:
             self.extending_article = ['']
+        if not self.date_from:
+            self.date_from = '1900-01-01'
+            self.date_to = '1900-01-01'
+        if not self.date_to:
+            self.date_from = '1900-01-01'
+            self.date_to = '1900-01-01'
+
