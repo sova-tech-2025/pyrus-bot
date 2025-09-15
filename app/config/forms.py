@@ -9,6 +9,6 @@ class TestFormStatus(Enum):
 
 class FormStatus(Enum):
     ACCOUNTS = 1216424 # Счета
-    BDR = 2346023 # Бюджет БДР
+    BDR = 1320105 # Бюджет БДР
     PAYMENTS = 1254419 # Платежи 2 и более ЮЛ
     CASH = 1177102 # Наличные КЕКС

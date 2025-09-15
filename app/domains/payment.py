@@ -53,10 +53,14 @@ class PaymentTask:
             elif field['name'] == "Статья БДР":
                 self.article_bdr = field.get("value").get("values") if field.get("value") is not None else None
             elif field['name'] == "Суммы по подразделениям":
-                for v in field.get("value"):
-                    self.unit_sums.append(UnitSum(
-                        unit=v.get("cells")[0].get("value").get("values"),
-                        total=v.get("cells")[1].get("value")
-                    ))
+                if field.get("value") is not None:
+                    for v in field.get("value"):
+                        self.unit_sums.append(UnitSum(
+                            unit=v.get("cells")[0].get("value").get("values"),
+                            total=v.get("cells")[1].get("value")
+                        ))
+
             if not self.extending_article:
                 self.extending_article = self.article_bdr
+            if not self.article_bdr and not self.extending_article:
+                self.extending_article = ['']

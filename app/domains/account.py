@@ -48,3 +48,5 @@ class AccountTask:
                 self.total = field.get("value")
         if not self.extending_article:
             self.extending_article = self.article_bdr
+        if not self.article_bdr and not self.extending_article:
+            self.extending_article = ['']
