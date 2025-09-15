@@ -174,7 +174,7 @@ def process_limit(ctx, bdr_compositions: list[BdrComposition]):
             "text": "",
             "field_updates": [
                 {
-                    "id": 6,
+                    "id": 10,
                     "value": bdr_composition.bdr.limit,
                 }
             ]
