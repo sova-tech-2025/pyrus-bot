@@ -37,4 +37,6 @@ class BdrTask:
         if not self.date_to:
             self.date_from = '1900-01-01'
             self.date_to = '1900-01-01'
+        if not self.units:
+            self.units = []
 
