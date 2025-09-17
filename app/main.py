@@ -69,9 +69,9 @@ def _prepare_response(body: str):
                 FormStatus.ACCOUNTS.value
             ]):
         handle_form_update(next((k.name for k in FormStatus if k.value == task.get("form_id")), None), task)
-        return
+        return {}
 
-    return
+    return {}
 
 @app.get("/")
 @app.get("/health")
