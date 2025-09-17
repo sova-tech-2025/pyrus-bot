@@ -67,7 +67,7 @@ def _prepare_response(body: str):
                 FormStatus.PAYMENTS.value,
                 FormStatus.CASH.value,
                 FormStatus.ACCOUNTS.value
-            ]):
+            ] and task.get("current_step") == 1):
         handle_form_update(next((k.name for k in FormStatus if k.value == task.get("form_id")), None), task)
         return {}
 
