@@ -68,8 +68,19 @@ def _prepare_response(body: str):
                 FormStatus.CASH.value,
                 FormStatus.ACCOUNTS.value
             ] and task.get("current_step") == 1):
-        handle_form_update(next((k.name for k in FormStatus if k.value == task.get("form_id")), None), task)
-        return {}
+        is_over_limit = handle_form_update(next((k.name for k in FormStatus if k.value == task.get("form_id")), None), task)
+        if is_over_limit is None:
+            return {}
+        elif is_over_limit:
+            return {
+                "text": "Задача согласована ботом",
+                "approval_choice": "approved",
+            }
+        else:
+            return {
+                "text": "Задача отклонена ботом",
+                "approval_choice": "rejected",
+            }
 
     return {}
 
