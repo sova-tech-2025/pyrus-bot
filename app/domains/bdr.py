@@ -4,8 +4,8 @@ class BdrTask:
     units: list[str]
     date_from: str
     date_to: str
-    budget: int
-    limit: int | None
+    budget: float
+    limit: float | None
 
     def __init__(self, task, limit=False):
         fields = task.get("fields")

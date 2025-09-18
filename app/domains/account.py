@@ -7,7 +7,7 @@ class AccountTask:
     article_bdr: list[str] | None
     units: list[str]
     date: str
-    total: int
+    total: float
     is_over_limit: bool
 
     OVERLIMIT_ID = 57

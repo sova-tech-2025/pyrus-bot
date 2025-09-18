@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 class UnitSum(BaseModel):
     unit: list[str]
-    total: int
+    total: float
 
 class PaymentTask:
     id: int
