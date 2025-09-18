@@ -71,7 +71,7 @@ def _prepare_response(body: str):
         is_over_limit = handle_form_update(next((k.name for k in FormStatus if k.value == task.get("form_id")), None), task)
         if is_over_limit is None:
             return {}
-        elif is_over_limit:
+        elif not is_over_limit:
             return {
                 "text": "Задача согласована ботом",
                 "approval_choice": "approved",
