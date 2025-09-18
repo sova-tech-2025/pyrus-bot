@@ -62,6 +62,7 @@ def _is_signature_correct(message: bytes, secret: bytes, signature: str) -> bool
 def _prepare_response(body: str):
     data = json.loads(body)
     task = data.get("task", {})
+    print(data)
     if (json.loads(body).get("event") == "comment"
             and task.get("form_id") in [
                 FormStatus.PAYMENTS.value,

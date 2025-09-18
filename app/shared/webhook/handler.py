@@ -32,4 +32,5 @@ def handle_form_update(key: str | None, input_task):
     is_over_limit = None
     if bdr_task:
         is_over_limit = process_limit_task(ctx, bdr_task)
+    print(is_over_limit)
     return is_over_limit
