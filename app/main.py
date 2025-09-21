@@ -5,7 +5,8 @@ import os
 
 from contextlib import asynccontextmanager
 from typing import Annotated
-
+import logging
+import sys
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from dotenv import load_dotenv
@@ -16,6 +17,12 @@ from app.shared.cron.jobs import authenticate, budget_count
 from app.shared.webhook.handler import handle_form_update
 
 load_dotenv()
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s [%(levelname)s] %(name)s - %(message)s",
+    handlers=[logging.StreamHandler(sys.stdout)]
+)
+logger = logging.getLogger(__name__)
 
 scheduler = AsyncIOScheduler()
 
@@ -31,7 +38,7 @@ async def lifespan(app: FastAPI):
     scheduler.add_job(budget_count, CronTrigger(minute=0))
     scheduler.add_job(authenticate, CronTrigger(hour="*/12"))
     scheduler.start()
-    print("Scheduler started")
+    logger.info("Scheduler started")
     authenticate()
     budget_count()
 
@@ -39,7 +46,7 @@ async def lifespan(app: FastAPI):
 
     # shutdown
     scheduler.shutdown()
-    print("Scheduler stopped")
+    logger.info("Scheduler stopped")
 
 app = FastAPI(lifespan=lifespan)
 
@@ -61,8 +68,9 @@ def _is_signature_correct(message: bytes, secret: bytes, signature: str) -> bool
 
 def _prepare_response(body: str):
     data = json.loads(body)
+    logger.debug(f"Incoming body: {data}")
     task = data.get("task", {})
-    print(data)
+    response = {}
     if (json.loads(body).get("event") == "comment"
             and task.get("form_id") in [
                 FormStatus.PAYMENTS.value,
@@ -70,20 +78,18 @@ def _prepare_response(body: str):
                 FormStatus.ACCOUNTS.value
             ] and task.get("current_step") == 1):
         is_over_limit = handle_form_update(next((k.name for k in FormStatus if k.value == task.get("form_id")), None), task)
-        if is_over_limit is None:
-            return {}
-        elif not is_over_limit:
-            return {
+        if not is_over_limit:
+            response = {
                 "text": "Задача согласована ботом",
                 "approval_choice": "approved",
             }
         else:
-            return {
+            response = {
                 "text": "Задача отклонена ботом",
                 "approval_choice": "rejected",
             }
-
-    return {}
+    logger.debug(f"Response: {response}")
+    return response
 
 @app.get("/")
 @app.get("/health")
