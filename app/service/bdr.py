@@ -174,7 +174,7 @@ def process_limit(ctx, bdr_compositions: list[BdrComposition]):
             "text": "",
             "field_updates": [
                 {
-                    "id": 10,
+                    "id": bdr_composition.bdr.limit_id,
                     "value": bdr_composition.bdr.limit,
                 }
             ]
@@ -263,7 +263,7 @@ def process_limit_task(ctx, bdr_composition: BdrComposition):
         "text": "",
         "field_updates": [
             {
-                "id": 10,
+                "id": bdr_composition.bdr.limit_id,
                 "value": bdr_composition.bdr.limit,
             }
         ]

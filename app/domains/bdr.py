@@ -6,11 +6,27 @@ class BdrTask:
     date_to: str
     budget: float
     limit: float | None
+    limit_id: int
+
+    # { DEV
+    #     "id": 6,
+    #     "type": "number",
+    #     "name": "Остаток",
+    #     "tooltip": "",
+    #     "value": 9900
+    # }
+    # { PROD
+    #     "id": 10,
+    #     "type": "number",
+    #     "name": "Остаток",
+    #     "tooltip": ""
+    # }
 
     def __init__(self, task, limit=False):
         fields = task.get("fields")
         self.id = task.get("id")
         self.limit = 0
+        self.limit_id = 6
 
         for field in fields:
             if field["name"] == "Статья расходов":
