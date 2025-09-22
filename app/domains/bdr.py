@@ -26,7 +26,8 @@ class BdrTask:
         fields = task.get("fields")
         self.id = task.get("id")
         self.limit = 0
-        self.limit_id = 6
+        # self.limit_id = 6
+        self.limit_id = 10
 
         for field in fields:
             if field["name"] == "Статья расходов":
