@@ -52,6 +52,7 @@ app = FastAPI(lifespan=lifespan)
 
 @app.post("/")
 async def index(request: Request, x_pyrus_sig: Annotated[str, Header()] = ...):
+    logger.debug('1111')
     body = await request.body()
     secret = SECRET_KEY.encode()
 
