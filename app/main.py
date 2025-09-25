@@ -71,7 +71,10 @@ def _prepare_response(body: str):
     data = json.loads(body)
     logger.debug(f"Incoming body: {data}")
     task = data.get("task", {})
-    response = {}
+    response = {
+        "text": "Ошибка обработки задачи, свяжитесь с администратором бота",
+        "approval_choice": "rejected",
+    }
     if (json.loads(body).get("event") == "comment"
             and task.get("form_id") in [
                 FormStatus.PAYMENTS.value,
@@ -81,12 +84,10 @@ def _prepare_response(body: str):
         is_over_limit = handle_form_update(next((k.name for k in FormStatus if k.value == task.get("form_id")), None), task)
         if not is_over_limit:
             response = {
-                "text": "Задача согласована ботом",
                 "approval_choice": "approved",
             }
         else:
             response = {
-                "text": "Задача отклонена ботом",
                 "approval_choice": "rejected",
             }
     logger.debug(f"Response: {response}")
