@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Header, HTTPException, Request
 
 from app.config.forms import FormStatus
-from app.shared.cron.jobs import authenticate, budget_count
+from app.shared.cron.jobs import authenticate, budget_count, set_all_limits
 from app.shared.webhook.handler import handle_form_update
 
 load_dotenv()
@@ -36,6 +36,7 @@ ctx = {"access_token": ""}
 async def lifespan(app: FastAPI):
     # startup
     scheduler.add_job(budget_count, CronTrigger(minute=0))
+    scheduler.add_job(set_all_limits, CronTrigger(minute=30))
     scheduler.add_job(authenticate, CronTrigger(hour="*/12"))
     scheduler.start()
     logger.info("Scheduler started")
