@@ -2,3 +2,4 @@
 .idea
 .env
 .creds
+__pycache__
