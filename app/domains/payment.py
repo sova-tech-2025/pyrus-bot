@@ -21,7 +21,7 @@ class PaymentTask:
     # OVERLIMIT_ID = 20
 
     def __init__(self, task):
-        fields = task.get("fields")
+        fields = task.get("fields") or []
 
         self.id = task.get("id")
         self.create_date = datetime.fromisoformat(
@@ -66,16 +66,23 @@ class PaymentTask:
                     else None
                 )
             elif field["name"] == "Суммы по подразделениям":
-                if field.get("value") is not None:
-                    for v in field.get("value"):
-                        print(v)
-                        self.unit_sums.append(
-                            UnitSum(
-                                unit=v.get("cells")[0].get("value").get("values"),
-                                total=v.get("cells")[1].get("value"),
-                            )
+                for v in field.get("value") or []:
+                    cells = v.get("cells") or []
+                    if len(cells) < 2:
+                        continue
+                    unit_cell = cells[0].get("value") if cells[0] else None
+                    total_cell = cells[1].get("value") if cells[1] else None
+                    unit_values = (
+                        unit_cell.get("values") if isinstance(unit_cell, dict) else None
+                    )
+                    if unit_values is None or total_cell is None:
+                        continue
+                    self.unit_sums.append(
+                        UnitSum(
+                            unit=unit_values,
+                            total=total_cell,
                         )
-
+                    )
             if not self.extending_article:
                 self.extending_article = self.article_bdr
             if not self.article_bdr and not self.extending_article:
