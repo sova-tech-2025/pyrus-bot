@@ -2,16 +2,20 @@ from app.config.forms import FormStatus
 from app.domains.account import AccountTask
 from app.domains.bdr import BdrTask
 from app.domains.cash import CashTask
+from app.domains.cash_new import CashNewTask
 from app.domains.payment import PaymentTask
+from app.domains.payment_new import PaymentNewTask
 from app.types.bdr_types import BdrComposition
 from app.shared.pyrus.pyrus import (
-    get_form_by_id, set_field_comment_BDR, set_field_comment_counts,
+    get_form_by_id,
+    set_field_comment_BDR,
+    set_field_comment_counts,
 )
 
 
 def associate_accounts(ctx, bdrs: list[BdrTask]) -> list[BdrComposition]:
-    data: list[BdrComposition] = [] # Список ассоциаций счетов к бюджету БДР
-    accounts: list[AccountTask] = [] # Список задач счетов
+    data: list[BdrComposition] = []  # Список ассоциаций счетов к бюджету БДР
+    accounts: list[AccountTask] = []  # Список задач счетов
 
     # Получение задач счетов
     for task in get_form_by_id(ctx, FormStatus.ACCOUNTS.value):
@@ -20,25 +24,33 @@ def associate_accounts(ctx, bdrs: list[BdrTask]) -> list[BdrComposition]:
     # Создание списка ассоциаций счетов к бюджету БДР
     for account in accounts:
         for bdr in bdrs:
-            if (set(account.extending_article) & set(bdr.extending_article)) and \
-                    ''.join(account.units) == ''.join(bdr.units) and \
-                    bdr.date_from <= account.date <= bdr.date_to:
+            if (
+                (set(account.extending_article) & set(bdr.extending_article))
+                and "".join(account.units) == "".join(bdr.units)
+                and bdr.date_from <= account.date <= bdr.date_to
+            ):
                 data.append(BdrComposition(bdr=bdr, task=account))
                 break
 
     return data
 
-def associate_account(bdrs: list[BdrTask], account: AccountTask) -> BdrComposition | None:
+
+def associate_account(
+    bdrs: list[BdrTask], account: AccountTask
+) -> BdrComposition | None:
     for bdr in bdrs:
-        if (set(account.extending_article) & set(bdr.extending_article)) and \
-                ''.join(account.units) == ''.join(bdr.units) and \
-                bdr.date_from <= account.date <= bdr.date_to:
+        if (
+            (set(account.extending_article) & set(bdr.extending_article))
+            and "".join(account.units) == "".join(bdr.units)
+            and bdr.date_from <= account.date <= bdr.date_to
+        ):
             return BdrComposition(bdr=bdr, task=account)
     return None
 
+
 def associate_cashes(ctx, bdrs: list[BdrTask]) -> list[BdrComposition]:
-    data: list[BdrComposition] = [] # Список ассоциаций наличных к бюджету БДР
-    cashes: list[CashTask] = [] # Список задач счетов
+    data: list[BdrComposition] = []  # Список ассоциаций наличных к бюджету БДР
+    cashes: list[CashTask] = []  # Список задач счетов
 
     # Получение задач счетов
     for task in get_form_by_id(ctx, FormStatus.CASH.value):
@@ -47,25 +59,64 @@ def associate_cashes(ctx, bdrs: list[BdrTask]) -> list[BdrComposition]:
     # Создание списка ассоциаций наличных к бюджету БДР
     for cash in cashes:
         for bdr in bdrs:
-            if (set(cash.extending_article) & set(bdr.extending_article)) and \
-                    ''.join(cash.units) == ''.join(bdr.units) and \
-                    bdr.date_from <= cash.date <= bdr.date_to:
+            if (
+                (set(cash.extending_article) & set(bdr.extending_article))
+                and "".join(cash.units) == "".join(bdr.units)
+                and bdr.date_from <= cash.date <= bdr.date_to
+            ):
                 data.append(BdrComposition(bdr=bdr, task=cash))
                 break
 
     return data
 
+
+def associate_new_cashes(ctx, bdrs: list[BdrTask]) -> list[BdrComposition]:
+    data: list[BdrComposition] = []  # Список ассоциаций наличных к бюджету БДР
+    cashes: list[CashNewTask] = []  # Список задач счетов
+
+    # Получение задач счетов
+    for task in get_form_by_id(ctx, FormStatus.CASH.value):
+        cashes.append(CashNewTask(task))
+
+    # Создание списка ассоциаций наличных к бюджету БДР
+    for cash in cashes:
+        for bdr in bdrs:
+            if (
+                (set(cash.extending_article) & set(bdr.extending_article))
+                and "".join(cash.units) == "".join(bdr.units)
+                and bdr.date_from <= cash.date <= bdr.date_to
+            ):
+                data.append(BdrComposition(bdr=bdr, task=cash))
+                break
+
+    return data
+
+
 def associate_cash(bdrs: list[BdrTask], cash: CashTask) -> BdrComposition | None:
     for bdr in bdrs:
-        if (set(cash.extending_article) & set(bdr.extending_article)) and \
-                ''.join(cash.units) == ''.join(bdr.units) and \
-                bdr.date_from <= cash.date <= bdr.date_to:
+        if (
+            (set(cash.extending_article) & set(bdr.extending_article))
+            and "".join(cash.units) == "".join(bdr.units)
+            and bdr.date_from <= cash.date <= bdr.date_to
+        ):
             return BdrComposition(bdr=bdr, task=cash)
     return None
 
+
+def associate_new_cash(bdrs: list[BdrTask], cash: CashNewTask) -> BdrComposition | None:
+    for bdr in bdrs:
+        if (
+            (set(cash.extending_article) & set(bdr.extending_article))
+            and "".join(cash.units) == "".join(bdr.units)
+            and bdr.date_from <= cash.date <= bdr.date_to
+        ):
+            return BdrComposition(bdr=bdr, task=cash)
+    return None
+
+
 def associate_payments(ctx, bdrs: list[BdrTask]) -> list[BdrComposition]:
-    data: list[BdrComposition] = [] # Список ассоциаций платежей к бюджету БДР
-    payments: list[PaymentTask] = [] # Список задач счетов
+    data: list[BdrComposition] = []  # Список ассоциаций платежей к бюджету БДР
+    payments: list[PaymentTask] = []  # Список задач счетов
 
     # Получение задач счетов
     for task in get_form_by_id(ctx, FormStatus.PAYMENTS.value):
@@ -75,24 +126,68 @@ def associate_payments(ctx, bdrs: list[BdrTask]) -> list[BdrComposition]:
     for payment in payments:
         for bdr in bdrs:
             for unit_sum in payment.unit_sums:
-                if (set(payment.extending_article) & set(bdr.extending_article)) and \
-                        ''.join(unit_sum.unit) == ''.join(bdr.units) and \
-                        bdr.date_from <= payment.date <= bdr.date_to:
+                if (
+                    (set(payment.extending_article) & set(bdr.extending_article))
+                    and "".join(unit_sum.unit) == "".join(bdr.units)
+                    and bdr.date_from <= payment.date <= bdr.date_to
+                ):
                     data.append(BdrComposition(bdr=bdr, task=payment))
                     break
     return data
 
-def associate_payment(bdrs: list[BdrTask], payment: PaymentTask) -> BdrComposition | None:
+
+def associate_new_payments(ctx, bdrs: list[BdrTask]) -> list[BdrComposition]:
+    data: list[BdrComposition] = []  # Список ассоциаций платежей к бюджету БДР
+    payments: list[PaymentNewTask] = []  # Список задач счетов
+
+    # Получение задач счетов
+    for task in get_form_by_id(ctx, FormStatus.PAYMENTS.value):
+        payments.append(PaymentNewTask(task))
+
+    # Создание списка ассоциаций наличных к бюджету БДР
+    for payment in payments:
+        for bdr in bdrs:
+            for unit_sum in payment.unit_sums:
+                if (
+                    (set(payment.extending_article) & set(bdr.extending_article))
+                    and "".join(unit_sum.unit) == "".join(bdr.units)
+                    and bdr.date_from <= payment.date <= bdr.date_to
+                ):
+                    data.append(BdrComposition(bdr=bdr, task=payment))
+                    break
+    return data
+
+
+def associate_payment(
+    bdrs: list[BdrTask], payment: PaymentTask
+) -> BdrComposition | None:
     for bdr in bdrs:
         for unit_sum in payment.unit_sums:
-            if (set(payment.extending_article) & set(bdr.extending_article)) and \
-                    ''.join(unit_sum.unit) == ''.join(bdr.units) and \
-                    bdr.date_from <= payment.date <= bdr.date_to:
+            if (
+                (set(payment.extending_article) & set(bdr.extending_article))
+                and "".join(unit_sum.unit) == "".join(bdr.units)
+                and bdr.date_from <= payment.date <= bdr.date_to
+            ):
                 return BdrComposition(bdr=bdr, task=payment)
     return None
 
+
+def associate_new_payment(
+    bdrs: list[BdrTask], payment: PaymentNewTask
+) -> BdrComposition | None:
+    for bdr in bdrs:
+        for unit_sum in payment.unit_sums:
+            if (
+                (set(payment.extending_article) & set(bdr.extending_article))
+                and "".join(unit_sum.unit) == "".join(bdr.units)
+                and bdr.date_from <= payment.date <= bdr.date_to
+            ):
+                return BdrComposition(bdr=bdr, task=payment)
+    return None
+
+
 def process_limit(ctx, bdr_compositions: list[BdrComposition]):
-    for bdr_composition in bdr_compositions: # Счета
+    for bdr_composition in bdr_compositions:  # Счета
         if isinstance(bdr_composition.task, AccountTask):
             # Уменьшение лимита если задача не превышает его.
             # Проставляем is_over_limit, если задача превышает лимит
@@ -104,19 +199,25 @@ def process_limit(ctx, bdr_compositions: list[BdrComposition]):
 
             # Обновляем превышение лимита
             try:
-                set_field_comment_counts(ctx, bdr_composition.task.id, {
-                                "text": "",
-                                "field_updates": [
-                                    {
-                                        "id": AccountTask.OVERLIMIT_ID,
-                                        "value": "checked" if bdr_composition.task.is_over_limit else "unchecked"
-                                    }
-                                ]
-                })
+                set_field_comment_counts(
+                    ctx,
+                    bdr_composition.task.id,
+                    {
+                        "text": "",
+                        "field_updates": [
+                            {
+                                "id": AccountTask.OVERLIMIT_ID,
+                                "value": "checked"
+                                if bdr_composition.task.is_over_limit
+                                else "unchecked",
+                            }
+                        ],
+                    },
+                )
             except AttributeError as e:
                 print(f"Error: {e}")
 
-        elif isinstance(bdr_composition.task, CashTask): # Наличные КЕКС
+        elif isinstance(bdr_composition.task, CashTask):  # Наличные КЕКС
             # Уменьшение лимита если задача не превышает его.
             # Проставляем is_over_limit, если задача превышает лимит
             if bdr_composition.bdr.limit >= bdr_composition.task.total:
@@ -127,27 +228,64 @@ def process_limit(ctx, bdr_compositions: list[BdrComposition]):
 
             # Обновляем превышение лимита
             try:
-                set_field_comment_counts(ctx, bdr_composition.task.id, {
-                    "text": "",
-                    "field_updates": [
-                        {
-                            "id": CashTask.OVERLIMIT_ID,
-                            "value": "checked" if bdr_composition.task.is_over_limit else "unchecked"
-                        }
-                    ]
-                })
+                set_field_comment_counts(
+                    ctx,
+                    bdr_composition.task.id,
+                    {
+                        "text": "",
+                        "field_updates": [
+                            {
+                                "id": CashTask.OVERLIMIT_ID,
+                                "value": "checked"
+                                if bdr_composition.task.is_over_limit
+                                else "unchecked",
+                            }
+                        ],
+                    },
+                )
             except AttributeError as e:
                 print(f"Error: {e}")
 
-        elif isinstance(bdr_composition.task, PaymentTask): # Платежи 2 и более ЮЛ
+        elif isinstance(bdr_composition.task, CashNewTask):  # Наличные КЕКС
+            # Уменьшение лимита если задача не превышает его.
+            # Проставляем is_over_limit, если задача превышает лимит
+            if bdr_composition.bdr.limit >= bdr_composition.task.total:
+                bdr_composition.bdr.limit -= bdr_composition.task.total
+                bdr_composition.task.is_over_limit = False
+            else:
+                bdr_composition.task.is_over_limit = True
+
+            # Обновляем превышение лимита
+            try:
+                set_field_comment_counts(
+                    ctx,
+                    bdr_composition.task.id,
+                    {
+                        "text": "",
+                        "field_updates": [
+                            {
+                                "id": CashTask.OVERLIMIT_ID,
+                                "value": "checked"
+                                if bdr_composition.task.is_over_limit
+                                else "unchecked",
+                            }
+                        ],
+                    },
+                )
+            except AttributeError as e:
+                print(f"Error: {e}")
+
+        elif isinstance(bdr_composition.task, PaymentTask):  # Платежи 2 и более ЮЛ
             payment = bdr_composition.task
             bdr = bdr_composition.bdr
             payment.unit_sums.sort(key=lambda item: item.total, reverse=True)
             flag = False
             for unit_sum in payment.unit_sums:
-                if (set(payment.extending_article) & set(bdr.extending_article)) and \
-                        ''.join(unit_sum.unit) == ''.join(bdr.units) and \
-                        bdr.date_from <= payment.date <= bdr.date_to:
+                if (
+                    (set(payment.extending_article) & set(bdr.extending_article))
+                    and "".join(unit_sum.unit) == "".join(bdr.units)
+                    and bdr.date_from <= payment.date <= bdr.date_to
+                ):
                     if bdr.limit >= unit_sum.total:
                         bdr.limit -= unit_sum.total
                     else:
@@ -157,28 +295,77 @@ def process_limit(ctx, bdr_compositions: list[BdrComposition]):
 
             # Обновляем превышение лимита
             try:
-                set_field_comment_counts(ctx, payment.id, {
-                    "text": "",
-                    "field_updates": [
-                        {
-                            "id": PaymentTask.OVERLIMIT_ID,
-                            "value": "checked" if payment.is_over_limit else "unchecked"
-                        }
-                    ]
-                })
+                set_field_comment_counts(
+                    ctx,
+                    payment.id,
+                    {
+                        "text": "",
+                        "field_updates": [
+                            {
+                                "id": PaymentTask.OVERLIMIT_ID,
+                                "value": "checked"
+                                if payment.is_over_limit
+                                else "unchecked",
+                            }
+                        ],
+                    },
+                )
+            except AttributeError as e:
+                print(f"Error: {e}")
+
+        elif isinstance(bdr_composition.task, PaymentNewTask):  # Платежи 2 и более ЮЛ
+            payment = bdr_composition.task
+            bdr = bdr_composition.bdr
+            payment.unit_sums.sort(key=lambda item: item.total, reverse=True)
+            flag = False
+            for unit_sum in payment.unit_sums:
+                if (
+                    (set(payment.extending_article) & set(bdr.extending_article))
+                    and "".join(unit_sum.unit) == "".join(bdr.units)
+                    and bdr.date_from <= payment.date <= bdr.date_to
+                ):
+                    if bdr.limit >= unit_sum.total:
+                        bdr.limit -= unit_sum.total
+                    else:
+                        flag = True
+            if flag:
+                payment.is_over_limit = True
+
+            # Обновляем превышение лимита
+            try:
+                set_field_comment_counts(
+                    ctx,
+                    payment.id,
+                    {
+                        "text": "",
+                        "field_updates": [
+                            {
+                                "id": PaymentTask.OVERLIMIT_ID,
+                                "value": "checked"
+                                if payment.is_over_limit
+                                else "unchecked",
+                            }
+                        ],
+                    },
+                )
             except AttributeError as e:
                 print(f"Error: {e}")
 
     for bdr_composition in bdr_compositions:
-        set_field_comment_BDR(ctx, bdr_composition.bdr.id, {
-            "text": "",
-            "field_updates": [
-                {
-                    "id": bdr_composition.bdr.limit_id,
-                    "value": bdr_composition.bdr.limit,
-                }
-            ]
-        })
+        set_field_comment_BDR(
+            ctx,
+            bdr_composition.bdr.id,
+            {
+                "text": "",
+                "field_updates": [
+                    {
+                        "id": bdr_composition.bdr.limit_id,
+                        "value": bdr_composition.bdr.limit,
+                    }
+                ],
+            },
+        )
+
 
 def process_limit_task(ctx, bdr_composition: BdrComposition):
     is_over_limit = None
@@ -193,19 +380,25 @@ def process_limit_task(ctx, bdr_composition: BdrComposition):
 
         # Обновляем превышение лимита
         try:
-            set_field_comment_counts(ctx, bdr_composition.task.id, {
-                            "text": "",
-                            "field_updates": [
-                                {
-                                    "id": AccountTask.OVERLIMIT_ID,
-                                    "value": "checked" if bdr_composition.task.is_over_limit else "unchecked"
-                                }
-                            ]
-            })
+            set_field_comment_counts(
+                ctx,
+                bdr_composition.task.id,
+                {
+                    "text": "",
+                    "field_updates": [
+                        {
+                            "id": AccountTask.OVERLIMIT_ID,
+                            "value": "checked"
+                            if bdr_composition.task.is_over_limit
+                            else "unchecked",
+                        }
+                    ],
+                },
+            )
         except AttributeError as e:
             print(f"Error: {e}")
 
-    elif isinstance(bdr_composition.task, CashTask): # Наличные КЕКС
+    elif isinstance(bdr_composition.task, CashTask):  # Наличные КЕКС
         # Уменьшение лимита если задача не превышает его.
         # Проставляем is_over_limit, если задача превышает лимит
         if bdr_composition.bdr.limit >= bdr_composition.task.total:
@@ -216,27 +409,64 @@ def process_limit_task(ctx, bdr_composition: BdrComposition):
 
         # Обновляем превышение лимита
         try:
-            set_field_comment_counts(ctx, bdr_composition.task.id, {
-                "text": "",
-                "field_updates": [
-                    {
-                        "id": CashTask.OVERLIMIT_ID,
-                        "value": "checked" if bdr_composition.task.is_over_limit else "unchecked"
-                    }
-                ]
-            })
+            set_field_comment_counts(
+                ctx,
+                bdr_composition.task.id,
+                {
+                    "text": "",
+                    "field_updates": [
+                        {
+                            "id": CashTask.OVERLIMIT_ID,
+                            "value": "checked"
+                            if bdr_composition.task.is_over_limit
+                            else "unchecked",
+                        }
+                    ],
+                },
+            )
         except AttributeError as e:
             print(f"Error: {e}")
 
-    elif isinstance(bdr_composition.task, PaymentTask): # Платежи 2 и более ЮЛ
+    elif isinstance(bdr_composition.task, CashNewTask):  # Наличные КЕКС
+        # Уменьшение лимита если задача не превышает его.
+        # Проставляем is_over_limit, если задача превышает лимит
+        if bdr_composition.bdr.limit >= bdr_composition.task.total:
+            bdr_composition.bdr.limit -= bdr_composition.task.total
+            bdr_composition.task.is_over_limit = False
+        else:
+            bdr_composition.task.is_over_limit = True
+
+        # Обновляем превышение лимита
+        try:
+            set_field_comment_counts(
+                ctx,
+                bdr_composition.task.id,
+                {
+                    "text": "",
+                    "field_updates": [
+                        {
+                            "id": CashTask.OVERLIMIT_ID,
+                            "value": "checked"
+                            if bdr_composition.task.is_over_limit
+                            else "unchecked",
+                        }
+                    ],
+                },
+            )
+        except AttributeError as e:
+            print(f"Error: {e}")
+
+    elif isinstance(bdr_composition.task, PaymentTask):  # Платежи 2 и более ЮЛ
         payment = bdr_composition.task
         bdr = bdr_composition.bdr
         payment.unit_sums.sort(key=lambda item: item.total, reverse=True)
         flag = False
         for unit_sum in payment.unit_sums:
-            if (set(payment.extending_article) & set(bdr.extending_article)) and \
-                    ''.join(unit_sum.unit) == ''.join(bdr.units) and \
-                    bdr.date_from <= payment.date <= bdr.date_to:
+            if (
+                (set(payment.extending_article) & set(bdr.extending_article))
+                and "".join(unit_sum.unit) == "".join(bdr.units)
+                and bdr.date_from <= payment.date <= bdr.date_to
+            ):
                 if bdr.limit >= unit_sum.total:
                     bdr.limit -= unit_sum.total
                 else:
@@ -246,27 +476,76 @@ def process_limit_task(ctx, bdr_composition: BdrComposition):
 
         # Обновляем превышение лимита
         try:
-            set_field_comment_counts(ctx, payment.id, {
-                "text": "",
-                "field_updates": [
-                    {
-                        "id": PaymentTask.OVERLIMIT_ID,
-                        "value": "checked" if payment.is_over_limit else "unchecked"
-                    }
-                ]
-            })
+            set_field_comment_counts(
+                ctx,
+                payment.id,
+                {
+                    "text": "",
+                    "field_updates": [
+                        {
+                            "id": PaymentTask.OVERLIMIT_ID,
+                            "value": "checked"
+                            if payment.is_over_limit
+                            else "unchecked",
+                        }
+                    ],
+                },
+            )
             is_over_limit = payment.is_over_limit
         except AttributeError as e:
             print(f"Error: {e}")
 
-    set_field_comment_BDR(ctx, bdr_composition.bdr.id, {
-        "text": "",
-        "field_updates": [
-            {
-                "id": bdr_composition.bdr.limit_id,
-                "value": bdr_composition.bdr.limit,
-            }
-        ]
-    })
+    elif isinstance(bdr_composition.task, PaymentNewTask):  # Платежи 2 и более ЮЛ
+        payment = bdr_composition.task
+        bdr = bdr_composition.bdr
+        payment.unit_sums.sort(key=lambda item: item.total, reverse=True)
+        flag = False
+        for unit_sum in payment.unit_sums:
+            if (
+                (set(payment.extending_article) & set(bdr.extending_article))
+                and "".join(unit_sum.unit) == "".join(bdr.units)
+                and bdr.date_from <= payment.date <= bdr.date_to
+            ):
+                if bdr.limit >= unit_sum.total:
+                    bdr.limit -= unit_sum.total
+                else:
+                    flag = True
+        if flag:
+            payment.is_over_limit = True
+
+        # Обновляем превышение лимита
+        try:
+            set_field_comment_counts(
+                ctx,
+                payment.id,
+                {
+                    "text": "",
+                    "field_updates": [
+                        {
+                            "id": PaymentTask.OVERLIMIT_ID,
+                            "value": "checked"
+                            if payment.is_over_limit
+                            else "unchecked",
+                        }
+                    ],
+                },
+            )
+            is_over_limit = payment.is_over_limit
+        except AttributeError as e:
+            print(f"Error: {e}")
+
+    set_field_comment_BDR(
+        ctx,
+        bdr_composition.bdr.id,
+        {
+            "text": "",
+            "field_updates": [
+                {
+                    "id": bdr_composition.bdr.limit_id,
+                    "value": bdr_composition.bdr.limit,
+                }
+            ],
+        },
+    )
 
     return is_over_limit

@@ -20,7 +20,7 @@ load_dotenv()
 logging.basicConfig(
     level=logging.DEBUG,
     format="%(asctime)s [%(levelname)s] %(name)s - %(message)s",
-    handlers=[logging.StreamHandler(sys.stdout)]
+    handlers=[logging.StreamHandler(sys.stdout)],
 )
 logger = logging.getLogger(__name__)
 
@@ -49,11 +49,13 @@ async def lifespan(app: FastAPI):
     scheduler.shutdown()
     logger.info("Scheduler stopped")
 
+
 app = FastAPI(lifespan=lifespan)
+
 
 @app.post("/")
 async def index(request: Request, x_pyrus_sig: Annotated[str, Header()] = ...):
-    logger.debug('1111')
+    logger.debug("1111")
     body = await request.body()
     secret = SECRET_KEY.encode()
 
@@ -76,13 +78,22 @@ def _prepare_response(body: str):
         "text": "Ошибка обработки задачи, свяжитесь с администратором бота",
         "approval_choice": "rejected",
     }
-    if (json.loads(body).get("event") == "comment"
-            and task.get("form_id") in [
-                FormStatus.PAYMENTS.value,
-                FormStatus.CASH.value,
-                FormStatus.ACCOUNTS.value
-            ] and task.get("current_step") == 1):
-        is_over_limit = handle_form_update(next((k.name for k in FormStatus if k.value == task.get("form_id")), None), task)
+    if (
+        json.loads(body).get("event") == "comment"
+        and task.get("form_id")
+        in [
+            FormStatus.PAYMENTS.value,
+            FormStatus.CASH.value,
+            FormStatus.ACCOUNTS.value,
+            FormStatus.CASH_NEW.value,
+            FormStatus.PAYMENTS_NEW.value,
+        ]
+        and task.get("current_step") == 1
+    ):
+        is_over_limit = handle_form_update(
+            next((k.name for k in FormStatus if k.value == task.get("form_id")), None),
+            task,
+        )
         if not is_over_limit:
             response = {
                 "approval_choice": "approved",
@@ -93,6 +104,7 @@ def _prepare_response(body: str):
             }
     logger.debug(f"Response: {response}")
     return response
+
 
 @app.get("/")
 @app.get("/health")
