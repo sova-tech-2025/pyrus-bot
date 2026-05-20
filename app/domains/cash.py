@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 
@@ -10,14 +11,17 @@ class CashTask:
     total: float
     is_over_limit: bool
 
-    OVERLIMIT_ID = 16
-    # OVERLIMIT_ID = 15
+    OVERLIMIT_ID = os.getenv("CASH_OVERLIMIT_ID")
+    # OVERLIMIT_ID = 16 prod
+    # OVERLIMIT_ID = 15 dev
 
     def __init__(self, task):
         fields = task.get("fields")
 
         self.id = task.get("id")
-        self.create_date = datetime.fromisoformat(task.get("create_date").replace("Z", "+00:00"))
+        self.create_date = datetime.fromisoformat(
+            task.get("create_date").replace("Z", "+00:00")
+        )
         self.is_over_limit = False
 
         # { DEV
@@ -36,13 +40,21 @@ class CashTask:
         # }
 
         for field in fields:
-            if field['name'] == "Дата расхода":
+            if field["name"] == "Дата расхода":
                 self.date = field.get("value")
-            elif field['name'] == "Подразделение":
-                self.units = field.get("value").get("values") if field.get("value") is not None else None
-            elif field['name'] == "Статья расходов":
-                self.extending_article = field.get("value").get("values") if field.get("value") is not None else None
-            elif field['name'] == "Сумма":
+            elif field["name"] == "Подразделение":
+                self.units = (
+                    field.get("value").get("values")
+                    if field.get("value") is not None
+                    else None
+                )
+            elif field["name"] == "Статья расходов":
+                self.extending_article = (
+                    field.get("value").get("values")
+                    if field.get("value") is not None
+                    else None
+                )
+            elif field["name"] == "Сумма":
                 self.total = field.get("value")
         if not self.date:
-            self.date = '1900-01-01'
+            self.date = "1900-01-01"

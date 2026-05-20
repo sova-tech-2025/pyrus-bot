@@ -1,0 +1,26 @@
+{
+  "[python]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+      "source.organizeImports": "explicit"
+    },
+    "editor.defaultFormatter": "charliermarsh.ruff"
+  },
+  "files.exclude": {
+    "*.venv": true,
+    ".ruff_cache": true,
+    "**/__pycache__": true,
+    "uploads": false,
+    "pyproject.toml": false,
+    "alembic.ini": false,
+    ".cz.toml": false,
+    ".creds": false,
+    ".github": false,
+    ".gitignore": false,
+    "docker-compose*": false,
+    "Dockerfile": false,
+    ".env.docker": false
+  },
+  "cSpell.words": ["onupdate", "venv"]
+}

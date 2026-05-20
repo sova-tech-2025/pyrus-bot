@@ -1,19 +1,18 @@
 import hashlib
 import hmac
 import json
+import logging
 import os
-
+import sys
 from contextlib import asynccontextmanager
 from typing import Annotated
-import logging
-import sys
+
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler.triggers.cron import CronTrigger
 from dotenv import load_dotenv
 from fastapi import FastAPI, Header, HTTPException, Request
 
 from app.config.forms import FormStatus
-from app.shared.cron.jobs import authenticate, budget_count, set_all_limits
+from app.shared.cron.jobs import authenticate, budget_count
 from app.shared.webhook.handler import handle_form_update
 
 load_dotenv()
@@ -27,7 +26,7 @@ logger = logging.getLogger(__name__)
 scheduler = AsyncIOScheduler()
 
 # env
-SECRET_KEY = os.getenv("BOT_SECRET_KEY")
+SECRET_KEY: str = os.getenv("BOT_SECRET_KEY") or ""
 
 ctx = {"access_token": ""}
 
@@ -35,10 +34,10 @@ ctx = {"access_token": ""}
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # startup
-    scheduler.add_job(budget_count, CronTrigger(minute=0))
-    scheduler.add_job(set_all_limits, CronTrigger(minute=30))
-    scheduler.add_job(authenticate, CronTrigger(hour="*/12"))
-    scheduler.start()
+    # scheduler.add_job(budget_count, CronTrigger(minute=0))
+    # scheduler.add_job(set_all_limits, CronTrigger(minute=30))
+    # scheduler.add_job(authenticate, CronTrigger(hour="*/12"))
+    # scheduler.start()
     logger.info("Scheduler started")
     authenticate()
     budget_count()
@@ -54,7 +53,7 @@ app = FastAPI(lifespan=lifespan)
 
 
 @app.post("/")
-async def index(request: Request, x_pyrus_sig: Annotated[str, Header()] = ...):
+async def index(request: Request, x_pyrus_sig: Annotated[str, Header()] = ...):  # type: ignore
     logger.debug("1111")
     body = await request.body()
     secret = SECRET_KEY.encode()
@@ -85,8 +84,8 @@ def _prepare_response(body: str):
             FormStatus.PAYMENTS.value,
             FormStatus.CASH.value,
             FormStatus.ACCOUNTS.value,
-            FormStatus.CASH_NEW.value,
-            FormStatus.PAYMENTS_NEW.value,
+            # FormStatus.CASH_NEW.value,
+            # FormStatus.PAYMENTS_NEW.value,
         ]
         and task.get("current_step") == 1
     ):

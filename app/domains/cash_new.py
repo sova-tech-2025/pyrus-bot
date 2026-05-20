@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 
@@ -10,8 +11,9 @@ class CashNewTask:
     total: float
     is_over_limit: bool
 
-    OVERLIMIT_ID = 14
-    # OVERLIMIT_ID = 14
+    OVERLIMIT_ID = os.getenv("CASH_NEW_OVERLIMIT_ID")
+    # OVERLIMIT_ID = 14 prod
+    # OVERLIMIT_ID = 14 dev
 
     def __init__(self, task):
         fields = task.get("fields")

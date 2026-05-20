@@ -5,12 +5,12 @@ from app.domains.cash import CashTask
 from app.domains.cash_new import CashNewTask
 from app.domains.payment import PaymentTask
 from app.domains.payment_new import PaymentNewTask
-from app.types.bdr_types import BdrComposition
 from app.shared.pyrus.pyrus import (
     get_form_by_id,
     set_field_comment_BDR,
     set_field_comment_counts,
 )
+from app.types.bdr_types import BdrComposition
 
 
 def associate_accounts(ctx, bdrs: list[BdrTask]) -> list[BdrComposition]:
@@ -25,7 +25,7 @@ def associate_accounts(ctx, bdrs: list[BdrTask]) -> list[BdrComposition]:
     for account in accounts:
         for bdr in bdrs:
             if (
-                (set(account.extending_article) & set(bdr.extending_article))
+                (set(account.extending_article) & set(bdr.extending_article))  # type: ignore
                 and "".join(account.units) == "".join(bdr.units)
                 and bdr.date_from <= account.date <= bdr.date_to
             ):
@@ -40,7 +40,7 @@ def associate_account(
 ) -> BdrComposition | None:
     for bdr in bdrs:
         if (
-            (set(account.extending_article) & set(bdr.extending_article))
+            (set(account.extending_article) & set(bdr.extending_article))  # type: ignore
             and "".join(account.units) == "".join(bdr.units)
             and bdr.date_from <= account.date <= bdr.date_to
         ):
@@ -60,7 +60,7 @@ def associate_cashes(ctx, bdrs: list[BdrTask]) -> list[BdrComposition]:
     for cash in cashes:
         for bdr in bdrs:
             if (
-                (set(cash.extending_article) & set(bdr.extending_article))
+                (set(cash.extending_article) & set(bdr.extending_article))  # type: ignore
                 and "".join(cash.units) == "".join(bdr.units)
                 and bdr.date_from <= cash.date <= bdr.date_to
             ):
@@ -82,7 +82,7 @@ def associate_new_cashes(ctx, bdrs: list[BdrTask]) -> list[BdrComposition]:
     for cash in cashes:
         for bdr in bdrs:
             if (
-                (set(cash.extending_article) & set(bdr.extending_article))
+                (set(cash.extending_article) & set(bdr.extending_article))  # type: ignore
                 and "".join(cash.units) == "".join(bdr.units)
                 and bdr.date_from <= cash.date <= bdr.date_to
             ):
@@ -95,7 +95,7 @@ def associate_new_cashes(ctx, bdrs: list[BdrTask]) -> list[BdrComposition]:
 def associate_cash(bdrs: list[BdrTask], cash: CashTask) -> BdrComposition | None:
     for bdr in bdrs:
         if (
-            (set(cash.extending_article) & set(bdr.extending_article))
+            (set(cash.extending_article) & set(bdr.extending_article))  # type: ignore
             and "".join(cash.units) == "".join(bdr.units)
             and bdr.date_from <= cash.date <= bdr.date_to
         ):
@@ -106,7 +106,7 @@ def associate_cash(bdrs: list[BdrTask], cash: CashTask) -> BdrComposition | None
 def associate_new_cash(bdrs: list[BdrTask], cash: CashNewTask) -> BdrComposition | None:
     for bdr in bdrs:
         if (
-            (set(cash.extending_article) & set(bdr.extending_article))
+            (set(cash.extending_article) & set(bdr.extending_article))  # type: ignore
             and "".join(cash.units) == "".join(bdr.units)
             and bdr.date_from <= cash.date <= bdr.date_to
         ):
@@ -127,9 +127,9 @@ def associate_payments(ctx, bdrs: list[BdrTask]) -> list[BdrComposition]:
         for bdr in bdrs:
             for unit_sum in payment.unit_sums:
                 if (
-                    (set(payment.extending_article) & set(bdr.extending_article))
+                    (set(payment.extending_article) & set(bdr.extending_article))  # type: ignore
                     and "".join(unit_sum.unit) == "".join(bdr.units)
-                    and bdr.date_from <= payment.date <= bdr.date_to
+                    and bdr.date_from <= payment.date <= bdr.date_to  # type: ignore
                 ):
                     data.append(BdrComposition(bdr=bdr, task=payment))
                     break
@@ -149,9 +149,9 @@ def associate_new_payments(ctx, bdrs: list[BdrTask]) -> list[BdrComposition]:
         for bdr in bdrs:
             for unit_sum in payment.unit_sums:
                 if (
-                    (set(payment.extending_article) & set(bdr.extending_article))
+                    (set(payment.extending_article) & set(bdr.extending_article))  # type: ignore
                     and "".join(unit_sum.unit) == "".join(bdr.units)
-                    and bdr.date_from <= payment.date <= bdr.date_to
+                    and bdr.date_from <= payment.date <= bdr.date_to  # type: ignore
                 ):
                     data.append(BdrComposition(bdr=bdr, task=payment))
                     break
@@ -164,9 +164,9 @@ def associate_payment(
     for bdr in bdrs:
         for unit_sum in payment.unit_sums:
             if (
-                (set(payment.extending_article) & set(bdr.extending_article))
+                (set(payment.extending_article) & set(bdr.extending_article))  # type: ignore
                 and "".join(unit_sum.unit) == "".join(bdr.units)
-                and bdr.date_from <= payment.date <= bdr.date_to
+                and bdr.date_from <= payment.date <= bdr.date_to  # type: ignore
             ):
                 return BdrComposition(bdr=bdr, task=payment)
     return None
@@ -178,9 +178,9 @@ def associate_new_payment(
     for bdr in bdrs:
         for unit_sum in payment.unit_sums:
             if (
-                (set(payment.extending_article) & set(bdr.extending_article))
+                (set(payment.extending_article) & set(bdr.extending_article))  # type: ignore
                 and "".join(unit_sum.unit) == "".join(bdr.units)
-                and bdr.date_from <= payment.date <= bdr.date_to
+                and bdr.date_from <= payment.date <= bdr.date_to  # type: ignore
             ):
                 return BdrComposition(bdr=bdr, task=payment)
     return None
@@ -191,8 +191,8 @@ def process_limit(ctx, bdr_compositions: list[BdrComposition]):
         if isinstance(bdr_composition.task, AccountTask):
             # Уменьшение лимита если задача не превышает его.
             # Проставляем is_over_limit, если задача превышает лимит
-            if bdr_composition.bdr.limit >= bdr_composition.task.total:
-                bdr_composition.bdr.limit -= bdr_composition.task.total
+            if bdr_composition.bdr.limit >= bdr_composition.task.total:  # type: ignore
+                bdr_composition.bdr.limit -= bdr_composition.task.total  # type: ignore
                 bdr_composition.task.is_over_limit = False
             else:
                 bdr_composition.task.is_over_limit = True
@@ -220,8 +220,8 @@ def process_limit(ctx, bdr_compositions: list[BdrComposition]):
         elif isinstance(bdr_composition.task, CashTask):  # Наличные КЕКС
             # Уменьшение лимита если задача не превышает его.
             # Проставляем is_over_limit, если задача превышает лимит
-            if bdr_composition.bdr.limit >= bdr_composition.task.total:
-                bdr_composition.bdr.limit -= bdr_composition.task.total
+            if bdr_composition.bdr.limit >= bdr_composition.task.total:  # type: ignore
+                bdr_composition.bdr.limit -= bdr_composition.task.total  # type: ignore
                 bdr_composition.task.is_over_limit = False
             else:
                 bdr_composition.task.is_over_limit = True
@@ -249,8 +249,8 @@ def process_limit(ctx, bdr_compositions: list[BdrComposition]):
         elif isinstance(bdr_composition.task, CashNewTask):  # Наличные КЕКС
             # Уменьшение лимита если задача не превышает его.
             # Проставляем is_over_limit, если задача превышает лимит
-            if bdr_composition.bdr.limit >= bdr_composition.task.total:
-                bdr_composition.bdr.limit -= bdr_composition.task.total
+            if bdr_composition.bdr.limit >= bdr_composition.task.total:  # type: ignore
+                bdr_composition.bdr.limit -= bdr_composition.task.total  # type: ignore
                 bdr_composition.task.is_over_limit = False
             else:
                 bdr_composition.task.is_over_limit = True
@@ -282,12 +282,12 @@ def process_limit(ctx, bdr_compositions: list[BdrComposition]):
             flag = False
             for unit_sum in payment.unit_sums:
                 if (
-                    (set(payment.extending_article) & set(bdr.extending_article))
+                    (set(payment.extending_article) & set(bdr.extending_article))  # type: ignore
                     and "".join(unit_sum.unit) == "".join(bdr.units)
-                    and bdr.date_from <= payment.date <= bdr.date_to
+                    and bdr.date_from <= payment.date <= bdr.date_to  # type: ignore
                 ):
-                    if bdr.limit >= unit_sum.total:
-                        bdr.limit -= unit_sum.total
+                    if bdr.limit >= unit_sum.total:  # type: ignore
+                        bdr.limit -= unit_sum.total  # type: ignore
                     else:
                         flag = True
             if flag:
@@ -320,12 +320,12 @@ def process_limit(ctx, bdr_compositions: list[BdrComposition]):
             flag = False
             for unit_sum in payment.unit_sums:
                 if (
-                    (set(payment.extending_article) & set(bdr.extending_article))
+                    (set(payment.extending_article) & set(bdr.extending_article))  # type: ignore
                     and "".join(unit_sum.unit) == "".join(bdr.units)
-                    and bdr.date_from <= payment.date <= bdr.date_to
+                    and bdr.date_from <= payment.date <= bdr.date_to  # type: ignore
                 ):
-                    if bdr.limit >= unit_sum.total:
-                        bdr.limit -= unit_sum.total
+                    if bdr.limit >= unit_sum.total:  # type: ignore
+                        bdr.limit -= unit_sum.total  # type: ignore
                     else:
                         flag = True
             if flag:
@@ -372,8 +372,8 @@ def process_limit_task(ctx, bdr_composition: BdrComposition):
     if isinstance(bdr_composition.task, AccountTask):
         # Уменьшение лимита если задача не превышает его.
         # Проставляем is_over_limit, если задача превышает лимит
-        if bdr_composition.bdr.limit >= bdr_composition.task.total:
-            bdr_composition.bdr.limit -= bdr_composition.task.total
+        if bdr_composition.bdr.limit >= bdr_composition.task.total:  # type: ignore
+            bdr_composition.bdr.limit -= bdr_composition.task.total  # type: ignore
             bdr_composition.task.is_over_limit = False
         else:
             bdr_composition.task.is_over_limit = True
@@ -401,8 +401,8 @@ def process_limit_task(ctx, bdr_composition: BdrComposition):
     elif isinstance(bdr_composition.task, CashTask):  # Наличные КЕКС
         # Уменьшение лимита если задача не превышает его.
         # Проставляем is_over_limit, если задача превышает лимит
-        if bdr_composition.bdr.limit >= bdr_composition.task.total:
-            bdr_composition.bdr.limit -= bdr_composition.task.total
+        if bdr_composition.bdr.limit >= bdr_composition.task.total:  # type: ignore
+            bdr_composition.bdr.limit -= bdr_composition.task.total  # type: ignore
             bdr_composition.task.is_over_limit = False
         else:
             bdr_composition.task.is_over_limit = True
@@ -430,8 +430,8 @@ def process_limit_task(ctx, bdr_composition: BdrComposition):
     elif isinstance(bdr_composition.task, CashNewTask):  # Наличные КЕКС
         # Уменьшение лимита если задача не превышает его.
         # Проставляем is_over_limit, если задача превышает лимит
-        if bdr_composition.bdr.limit >= bdr_composition.task.total:
-            bdr_composition.bdr.limit -= bdr_composition.task.total
+        if bdr_composition.bdr.limit >= bdr_composition.task.total:  # type: ignore
+            bdr_composition.bdr.limit -= bdr_composition.task.total  # type: ignore
             bdr_composition.task.is_over_limit = False
         else:
             bdr_composition.task.is_over_limit = True
@@ -463,12 +463,12 @@ def process_limit_task(ctx, bdr_composition: BdrComposition):
         flag = False
         for unit_sum in payment.unit_sums:
             if (
-                (set(payment.extending_article) & set(bdr.extending_article))
+                (set(payment.extending_article) & set(bdr.extending_article))  # type: ignore
                 and "".join(unit_sum.unit) == "".join(bdr.units)
-                and bdr.date_from <= payment.date <= bdr.date_to
+                and bdr.date_from <= payment.date <= bdr.date_to  # type: ignore
             ):
-                if bdr.limit >= unit_sum.total:
-                    bdr.limit -= unit_sum.total
+                if bdr.limit >= unit_sum.total:  # type: ignore
+                    bdr.limit -= unit_sum.total  # type: ignore
                 else:
                     flag = True
         if flag:
@@ -502,12 +502,12 @@ def process_limit_task(ctx, bdr_composition: BdrComposition):
         flag = False
         for unit_sum in payment.unit_sums:
             if (
-                (set(payment.extending_article) & set(bdr.extending_article))
+                (set(payment.extending_article) & set(bdr.extending_article))  # type: ignore
                 and "".join(unit_sum.unit) == "".join(bdr.units)
-                and bdr.date_from <= payment.date <= bdr.date_to
+                and bdr.date_from <= payment.date <= bdr.date_to  # type: ignore
             ):
-                if bdr.limit >= unit_sum.total:
-                    bdr.limit -= unit_sum.total
+                if bdr.limit >= unit_sum.total:  # type: ignore
+                    bdr.limit -= unit_sum.total  # type: ignore
                 else:
                     flag = True
         if flag:

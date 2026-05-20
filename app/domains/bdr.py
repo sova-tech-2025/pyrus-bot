@@ -1,3 +1,6 @@
+import os
+
+
 class BdrTask:
     id: int
     extending_article: list[str]
@@ -26,14 +29,23 @@ class BdrTask:
         fields = task.get("fields")
         self.id = task.get("id")
         self.limit = 0
-        # self.limit_id = 6
-        self.limit_id = 10
+        # self.limit_id = 6 dev
+        # self.limit_id = 10 prod
+        self.limit_id = int(os.getenv("BDR_OVERLIMIT_ID") or "")
 
         for field in fields:
             if field["name"] == "Статья расходов":
-                self.extending_article = field.get("value").get("values") if field.get("value") is not None else None
+                self.extending_article = (
+                    field.get("value").get("values")
+                    if field.get("value") is not None
+                    else None
+                )
             elif field["name"] == "Подразделения 1С":
-                self.units = field.get("value").get("values") if field.get("value") is not None else None
+                self.units = (
+                    field.get("value").get("values")
+                    if field.get("value") is not None
+                    else None
+                )
             elif field["name"] == "От":
                 self.date_from = field.get("value")
             elif field["name"] == "До":
@@ -47,13 +59,12 @@ class BdrTask:
         elif self.limit == 0 or self.limit is None:
             self.limit = self.budget
         if not self.extending_article:
-            self.extending_article = ['']
+            self.extending_article = [""]
         if not self.date_from:
-            self.date_from = '1900-01-01'
-            self.date_to = '1900-01-01'
+            self.date_from = "1900-01-01"
+            self.date_to = "1900-01-01"
         if not self.date_to:
-            self.date_from = '1900-01-01'
-            self.date_to = '1900-01-01'
+            self.date_from = "1900-01-01"
+            self.date_to = "1900-01-01"
         if not self.units:
             self.units = []
-

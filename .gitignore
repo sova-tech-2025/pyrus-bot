@@ -1,6 +1,6 @@
 .venv
 .idea
-.env
+.env*
 .creds
 __pycache__
 2

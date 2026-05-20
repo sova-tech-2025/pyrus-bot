@@ -5,17 +5,17 @@ from app.service.bdr import (
     associate_cashes,
     associate_new_cashes,
     associate_new_payments,
-    process_limit,
     associate_payments,
+    process_limit,
 )
 from app.shared.pyrus.pyrus import auth, get_form_by_id, set_field_comment_BDR
 from app.types.bdr_types import BdrComposition
 
 
 def _get_ctx():
-    from app import main
+    from main import ctx
 
-    return main.ctx
+    return ctx
 
 
 def budget_count():

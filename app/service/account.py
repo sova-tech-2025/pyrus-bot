@@ -5,9 +5,9 @@ from app.shared.pyrus.pyrus import get_form_by_id, set_field_comment_counts
 
 
 def _get_ctx():
-    from app import main
+    from main import ctx
 
-    return main.ctx
+    return ctx
 
 
 def process_task(task):
@@ -20,11 +20,11 @@ def process_task(task):
 
     for bdr in bdrs:
         if (
-            (set(account.extending_article) & set(bdr.extending_article))
+            (set(account.extending_article) & set(bdr.extending_article))  # type: ignore
             and "".join(account.units) == "".join(bdr.units)
             and bdr.date_from <= account.date <= bdr.date_to
         ):
-            if bdr.limit >= account.total:
+            if bdr.limit >= account.total:  # type: ignore
                 account.is_over_limit = False
             else:
                 account.is_over_limit = True

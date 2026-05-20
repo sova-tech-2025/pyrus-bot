@@ -58,4 +58,10 @@ jobs:
             -p 8034:8034 \
             -e BOT_SECRET_KEY=${{ secrets.BOT_SECRET_KEY }} \
             -e BOT_LOGIN=${{ secrets.BOT_LOGIN }} \
+            -e BOT_LOGIN=${{ secrets.ACCOUNT_OVERLIMIT_ID }} \
+            -e BOT_LOGIN=${{ secrets.BDR_OVERLIMIT_ID }} \
+            -e BOT_LOGIN=${{ secrets.CASH_OVERLIMIT_ID }} \
+            -e BOT_LOGIN=${{ secrets.PAYMENT_OVERLIMIT_ID }} \
+            -e BOT_LOGIN=${{ secrets.CASH_NEW_OVERLIMIT_ID }} \
+            -e BOT_LOGIN=${{ secrets.PAYMENT_NEW_OVERLIMIT_ID }} \
             $IMAGE_NAME

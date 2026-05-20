@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 from pydantic import BaseModel
@@ -17,8 +18,9 @@ class PaymentTask:
     date: str | None
     is_over_limit: bool
 
-    OVERLIMIT_ID = 27
-    # OVERLIMIT_ID = 20
+    OVERLIMIT_ID = os.getenv("PAYMENT_OVERLIMIT_ID")
+    # OVERLIMIT_ID = 27 prod
+    # OVERLIMIT_ID = 20 dev
 
     def __init__(self, task):
         fields = task.get("fields") or []
