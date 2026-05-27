@@ -71,8 +71,6 @@ def _is_signature_correct(message: bytes, secret: bytes, signature: str) -> bool
 
 def _prepare_response(body: str):
     logger.debug(f"Incoming body: {body}")
-    # with open("1.txt", "r", encoding="utf-8") as f:
-    #     body = f.read()
 
     data = json.loads(body)
 
@@ -97,7 +95,7 @@ def _prepare_response(body: str):
             next((k.name for k in FormStatus if k.value == task.get("form_id")), None),
             task,
         )
-        if not is_over_limit:
+        if isinstance(is_over_limit, bool) and not is_over_limit:
             response = {
                 "approval_choice": "approved",
             }
