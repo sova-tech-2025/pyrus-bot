@@ -70,8 +70,12 @@ def _is_signature_correct(message: bytes, secret: bytes, signature: str) -> bool
 
 
 def _prepare_response(body: str):
+    logger.debug(f"Incoming body: {body}")
+    # with open("1.txt", "r", encoding="utf-8") as f:
+    #     body = f.read()
+
     data = json.loads(body)
-    logger.debug(f"Incoming body: {data}")
+
     task = data.get("task", {})
     response = {
         "text": "Ошибка обработки задачи, свяжитесь с администратором бота",
@@ -109,3 +113,6 @@ def _prepare_response(body: str):
 @app.get("/health")
 async def health():
     return {"status": "ok"}
+
+
+_prepare_response("")
