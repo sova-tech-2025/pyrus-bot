@@ -113,6 +113,3 @@ def _prepare_response(body: str):
 @app.get("/health")
 async def health():
     return {"status": "ok"}
-
-
-_prepare_response("")
