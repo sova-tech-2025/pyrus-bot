@@ -2,10 +2,14 @@ from app.config.forms import FormStatus
 from app.domains.account import AccountTask
 from app.domains.bdr import BdrTask
 from app.domains.cash import CashTask
+from app.domains.cash_new import CashNewTask
 from app.domains.payment import PaymentTask
+from app.domains.payment_new import PaymentNewTask
 from app.service.bdr import (
     associate_account,
     associate_cash,
+    associate_new_cash,
+    associate_new_payment,
     associate_payment,
     process_limit_task,
 )
@@ -38,12 +42,12 @@ def handle_form_update(key: str | None, input_task):
     elif key == "CASH":
         cash = CashTask(input_task)
         bdr_task = associate_cash(bdrs, cash)
-    # elif key == "PAYMENTS_NEW":
-    #     payment = PaymentNewTask(input_task)
-    #     bdr_task = associate_new_payment(bdrs, payment)
-    # elif key == "CASH_NEW":
-    #     cash = CashNewTask(input_task)
-    #     bdr_task = associate_new_cash(bdrs, cash)
+    elif key == "PAYMENTS_NEW":
+        payment = PaymentNewTask(input_task)
+        bdr_task = associate_new_payment(bdrs, payment)
+    elif key == "CASH_NEW":
+        cash = CashNewTask(input_task)
+        bdr_task = associate_new_cash(bdrs, cash)
 
     is_over_limit = None
     if bdr_task:
