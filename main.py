@@ -100,6 +100,10 @@ def _prepare_response(body: str):
             response = {
                 "approval_choice": "approved",
             }
+        elif is_over_limit is None:
+            response = {
+                "approval_choice": "approved",
+            }
         else:
             response = {
                 "approval_choice": "rejected",
