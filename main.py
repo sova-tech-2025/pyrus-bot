@@ -8,11 +8,12 @@ from contextlib import asynccontextmanager
 from typing import Annotated
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
 from dotenv import load_dotenv
 from fastapi import FastAPI, Header, HTTPException, Request
 
 from app.config.forms import FormStatus
-from app.shared.cron.jobs import authenticate
+from app.shared.cron.jobs import authenticate, budget_count, set_all_limits
 from app.shared.webhook.handler import handle_form_update
 
 load_dotenv()
@@ -34,13 +35,13 @@ ctx = {"access_token": ""}
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # startup
-    # scheduler.add_job(budget_count, CronTrigger(minute=0))
-    # scheduler.add_job(set_all_limits, CronTrigger(minute=30))
-    # scheduler.add_job(authenticate, CronTrigger(hour="*/12"))
-    # scheduler.start()
+    scheduler.add_job(budget_count, CronTrigger(minute=0))
+    scheduler.add_job(set_all_limits, CronTrigger(minute=30))
+    scheduler.add_job(authenticate, CronTrigger(hour="*/12"))
+    scheduler.start()
     logger.info("Scheduler started")
     authenticate()
-    # budget_count()
+    budget_count()
 
     yield
 
@@ -77,37 +78,42 @@ def _prepare_response(body: str):
     task = data.get("task", {})
     response = {
         "text": "Ошибка обработки задачи, свяжитесь с администратором бота",
-        "approval_choice": "rejected",
     }
-    if (
-        json.loads(body).get("event") == "comment"
-        and task.get("form_id")
-        in [
-            FormStatus.PAYMENTS.value,
-            FormStatus.CASH.value,
-            FormStatus.ACCOUNTS.value,
-            FormStatus.CASH_NEW.value,
-            FormStatus.PAYMENTS_NEW.value,
-        ]
-        and task.get("current_step") == 1
-    ):
-        is_over_limit = handle_form_update(
-            next((k.name for k in FormStatus if k.value == task.get("form_id")), None),
-            task,
-        )
-        if isinstance(is_over_limit, bool) and not is_over_limit:
-            response = {
-                "approval_choice": "approved",
-            }
-        elif is_over_limit is None:
-            response = {
-                "approval_choice": "approved",
-            }
-        else:
-            response = {
-                "approval_choice": "rejected",
-            }
+    try:
+        if (
+            json.loads(body).get("event") == "comment"
+            and task.get("form_id")
+            in [
+                FormStatus.PAYMENTS.value,
+                FormStatus.CASH.value,
+                FormStatus.ACCOUNTS.value,
+                FormStatus.CASH_NEW.value,
+                FormStatus.PAYMENTS_NEW.value,
+            ]
+            and task.get("current_step") == 1
+        ):
+            is_over_limit = handle_form_update(
+                next(
+                    (k.name for k in FormStatus if k.value == task.get("form_id")), None
+                ),
+                task,
+            )
+            if isinstance(is_over_limit, bool) and not is_over_limit:
+                response = {
+                    "approval_choice": "approved",
+                }
+            elif is_over_limit is None:
+                response = {
+                    "approval_choice": "approved",
+                }
+            else:
+                response = {
+                    "approval_choice": "rejected",
+                }
+    except Exception as e:
+        logger.debug(e)
     logger.debug(f"Response: {response}")
+
     return response
 
 

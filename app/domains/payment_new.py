@@ -57,7 +57,7 @@ class PaymentNewTask:
                     self.date = self.create_date.strftime("%Y-%m-%d")
             elif field["name"] == "Статья расходов":
                 self.extending_article = (
-                    field.get("value").get("values")
+                    field.get("value").get("choice_names")
                     if field.get("value") is not None
                     else None
                 )
