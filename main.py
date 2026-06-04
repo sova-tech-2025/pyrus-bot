@@ -86,8 +86,8 @@ def _prepare_response(body: str):
             FormStatus.PAYMENTS.value,
             FormStatus.CASH.value,
             FormStatus.ACCOUNTS.value,
-            # FormStatus.CASH_NEW.value,
-            # FormStatus.PAYMENTS_NEW.value,
+            FormStatus.CASH_NEW.value,
+            FormStatus.PAYMENTS_NEW.value,
         ]
         and task.get("current_step") == 1
     ):
