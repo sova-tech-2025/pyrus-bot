@@ -55,6 +55,7 @@ jobs:
             docker rm budget-limit || true
             docker run -d \
             --name budget-limit \
+            --restart=always \
             -p 8034:8034 \
             -e BOT_SECRET_KEY=${{ secrets.BOT_SECRET_KEY }} \
             -e BOT_LOGIN=${{ secrets.BOT_LOGIN }} \
