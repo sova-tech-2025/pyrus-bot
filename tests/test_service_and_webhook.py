@@ -90,6 +90,61 @@ def test_recalculate_writes_flags_then_remaining():
     ]
 
 
+def bdr_for_unit(task_id, unit, budget):
+    return {
+        "id": task_id,
+        "fields": [
+            f("Статья расходов", {"values": ["A"]}),
+            f("Подразделения 1С", {"values": [unit]}),
+            f("От", "2025-01-01"),
+            f("До", "2025-12-31"),
+            f("Бюджет", budget),
+        ],
+    }
+
+
+def split_payment(task_id, sums, flag):
+    rows = [{"cells": [{"value": {"values": [u]}}, {"value": t}]} for u, t in sums]
+    return {
+        "id": task_id,
+        "create_date": "2025-02-01T00:00:00Z",
+        "fields": [
+            f("Дата", "2025-03-01"),
+            f("Статья расходов", {"values": ["A"]}),
+            f("Суммы по подразделениям", rows),
+            {"id": 27, "name": "Превышение лимита", "value": flag},
+        ],
+    }
+
+
+def flag_writes(pyrus, task_id):
+    return [u for tid, u in pyrus.updates if tid == task_id]
+
+
+def test_split_payment_flag_is_written_once_with_final_value():
+    """Баг с уведомлениями: платёж на несколько подразделений, в одном не хватает
+    бюджета. Раньше галочка прыгала «снята → стоит» десятки раз за пересчёт."""
+    budgets = [bdr_for_unit(1, "U1", 1000), bdr_for_unit(2, "U2", 10)]
+    pay = split_payment(5, [("U1", 50), ("U2", 50)], "unchecked")
+    pyrus = FakePyrus({FormId.BDR: budgets, FormId.PAYMENTS: [pay]})
+
+    BudgetService(pyrus, SETTINGS).recalculate()
+
+    assert flag_writes(pyrus, 5) == [[{"id": "27", "value": "checked"}]]
+
+
+def test_unchanged_flag_is_not_rewritten():
+    """Если галочка в Pyrus уже правильная, бот её не трогает,
+    и маршрут задачи не перестраивается."""
+    budgets = [bdr_for_unit(1, "U1", 1000), bdr_for_unit(2, "U2", 10)]
+    pay = split_payment(5, [("U1", 50), ("U2", 50)], "checked")
+    pyrus = FakePyrus({FormId.BDR: budgets, FormId.PAYMENTS: [pay]})
+
+    BudgetService(pyrus, SETTINGS).recalculate()
+
+    assert flag_writes(pyrus, 5) == []
+
+
 def test_reset_remaining_sets_full_budget():
     pyrus = FakePyrus({FormId.BDR: [BDR]})
     BudgetService(pyrus, SETTINGS).reset_remaining()
